@@ -240,27 +240,32 @@
                 }
                 return "";
             }
+
         var startTime = getCookie("startTimeEpoch");
         if (startTime != "") {
             this.stValue = startTime;
         } else {
+            document.cookie = "startTimeEpoch=" + this.stValue;
             }
         var endTime = getCookie("endTimeEpoch");
         if (endTime != "") {
             this.etValue = endTime;
         } else {
+            document.cookie = "endTimeEpoch=" + this.etValue;
             }
         var startTimeFriendly = getCookie("startTime");
         if (startTimeFriendly != "") {
             this.globalStartTime = startTimeFriendly;
             this.defaultStartTime = this.globalStartTime;
         } else {
+            document.cookie = "startTime=" + friendlyStartTime;
             }
         var endTimeFriendly = getCookie("endTime");
         if (endTimeFriendly != "") {
             this.globalEndTime = endTimeFriendly;
             this.defaultEndTime = this.globalEndTime;
         } else {
+            document.cookie = "endTime=" + friendlyEndTime;
             }
 
       },

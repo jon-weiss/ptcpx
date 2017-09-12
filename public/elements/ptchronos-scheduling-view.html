@@ -1,0 +1,126 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/px-dropdown/px-dropdown.html">
+<link rel="import" href="../bower_components/px-datetime-picker/px-datetime-picker.html">
+
+
+<dom-module id="scheduling-view">
+  <template>
+    <style>
+        .startDate{
+            display:block;
+            float:left;
+            width: 300px;
+
+        }
+        .endDate{
+            display:block;
+            float:left;
+            width: 300px;
+            
+        }
+        .label{
+            display: block;
+            clear:both;
+            padding-bottom: 10px;
+        }
+        .lineSelection{
+            display:block;
+            float: left;
+            clear: left;
+            margin-top: 20px;
+            width: 300px;
+        }
+        .submitSchedule{
+            display:block;
+            float: left;
+            margin-top: 20px;
+            width: 300px;
+        }
+        .submitSchedule button{
+            display: block;
+            height: 30px;
+            width: 100px;
+            text-align: center;
+            color: #fff;
+            border: none;
+            background: #086E87;
+            transition: ease all .3s;
+            margin: 20px auto 0;
+        }
+        .submitSchedule button:hover{
+            background: #1B2A33;
+            color: #fff;
+            transition: ease all .3s;
+        }
+    </style>
+        <div class="startDate">
+            <span class="label">
+                Start Time:
+            </span>
+            <px-datetime-picker id="startTime"
+                date-format="YYYY/MM/DD"
+                time-format="HH:mm:ss"
+                time-zone="Canada/Eastern"
+                show-time-zone="abbreviatedText"
+                date-time$="{{defaultStartTime}}">
+            </px-datetime-picker>
+        </div>
+        <div class="endDate">
+            <span class="label">
+                End Time:
+            </span>
+            <px-datetime-picker id="endTime"
+                date-format="YYYY/MM/DD"
+                time-format="HH:mm:ss"
+                time-zone="Canada/Eastern"
+                show-time-zone="abbreviatedText"
+                date-time$="{{defaultEndTime}}">
+            </px-datetime-picker>
+        </div>
+        
+        <div class="lineSelection">
+             <span class="label">
+                Line:
+            </span>
+            <select>
+                <option value="Line1">Line 1</option>
+                <option value="Line2">Line 2</option>
+            </select>
+        </div>
+         <div class="submitSchedule">
+             <button on-click="dateChanged">Submit</button>
+        </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'scheduling-view',
+      properties: {},
+      listeners: {
+        },
+      ready: function() {
+        var that = this;
+       var hrFromNow = new Date();
+       hrFromNow.setHours(hrFromNow.getHours() + 1);
+       var defaultEndTime = Math.round(new Date(hrFromNow).getTime()/1000.0);
+       var friendlyEndTime = new Date(defaultEndTime * 1000).toISOString();
+       this.defaultEndTime = friendlyEndTime;
+       
+       var lastHr = new Date();
+       lastHr.setHours(lastHr.getHours() - 1);
+       var defaultStartTime = Math.round(new Date().getTime()/1000.0);
+       var friendlyStartTime = new Date(defaultStartTime * 1000).toISOString();
+       this.defaultStartTime = friendlyStartTime;
+
+        
+      },
+    dateChanged: function(){
+        this.stValue = $("#startTime")[0].dateTime;
+       // var stEpochValue = stValue.getTime()/1000.0;
+        this.etValue = $("#endTime")[0].dateTime;
+        console.log("Start" + this.stValue );
+        console.log("End" + this.etValue);
+    }
+    });
+  </script>
+</dom-module>
