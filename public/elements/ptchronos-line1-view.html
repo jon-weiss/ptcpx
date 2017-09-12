@@ -1,0 +1,448 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/px-card/px-card.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="./line-view/line-view.html">
+
+<dom-module id="ptchronos-line-1">
+  <template>
+    <iron-ajax 
+    id="getBagger1Count" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger1Count}}" 
+    on-response="onResponseLine1Count" 
+    headers = '{"name":"PTChronos_L1.N7:19"}'
+    >
+  </iron-ajax>
+  <iron-ajax 
+    id="getBagger2Count" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger2Count}}" 
+    on-response="onResponseLine2Count" 
+    headers = '{"name":"PTChronos_L2.N7:19"}'
+    >
+  </iron-ajax>
+    <iron-ajax 
+    id="getBagger1FaultStatus" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger1FaultStatus}}" 
+    on-response="onResponseLine1FaultStatus" 
+    headers = '{"name":"PTChronos_L1.N7:11"}'
+    >
+    </iron-ajax>
+  <iron-ajax 
+    id="getBagger2FaultStatus" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger2FaultStatus}}" 
+    on-response="onResponseLine2FaultStatus" 
+     headers = '{"name":"PTChronos_L2.N7:11"}'
+    >
+  </iron-ajax>
+  <iron-ajax 
+    id="getBagger1Status" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger1Status}}" 
+    on-response="onResponseLine1Status" 
+     headers = '{"name":"PTChronos_L1.N7:1"}'
+    >
+  </iron-ajax>
+  <iron-ajax 
+    id="getBagger2Status" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger2Status}}" 
+    on-response="onResponseLine2Status" 
+     headers = '{"name":"PTChronos_L2.N7:1"}'
+    >
+  </iron-ajax>
+   <iron-ajax 
+    id="getBPMUnit1" 
+    url="/api/latestTagValue" 
+    last-response="{{lastUnit1BPML}}" 
+    on-response="onResponseLine2Status" 
+     headers = '{"name":"PTChronos_L1.calc.bpm"}'
+    >
+  </iron-ajax>
+  <iron-ajax 
+    id="getBPMUnit2" 
+    url="/api/latestTagValue" 
+    last-response="{{lastUnit2BPML}}" 
+    on-response="onResponseLine2Status" 
+     headers = '{"name":"PTChronos_L2.calc.bpm"}'
+    >
+  </iron-ajax>
+    <line-view selected-line$="{{selectedLine}}" line-data$="{{lineData}}" line-b-p-m$="{{lineBPM}}" line-status$="{{lineStatus}}"></line-view>          
+  </template>
+  <script>
+    Polymer({
+      is: 'ptchronos-line-1',
+      properties: {
+        selectedLine: {
+            type: String,
+            value: "1"
+        },
+          lineData: {
+            type: Object,
+            value: ""
+        },
+        productionGood: {
+            type: Number,
+            value: 1000
+        },
+          productionMiddle: {
+            type: Number,
+            value: 900
+        },
+          productionBad: {
+            type: Number,
+            value: 600
+        },
+          unit1Target: {
+            type: Number,
+            value: 1000
+        },
+          unit2Target: {
+            type: Number,
+            value: 1000
+        },
+          unit1DT: {
+            type: String,
+            value: "03:20"
+        },
+          unit2DT: {
+            type: String,
+            value: "04:20"
+        },
+          unit1OEE: {
+            type: String,
+            value: "80"
+        },
+          unit2OEE: {
+            type: String,
+            value: "90"
+        },
+          unit1Rejected: {
+            type: String,
+            value: "18"
+        },
+          unit2Rejected: {
+            type: String,
+            value: "24"
+        },
+          unit1Description: {
+            type: String,
+            value: "First Bagger"
+        },
+          unit2Description: {
+            type: String,
+            value: "Second Bagger"
+        },
+          unit3Description: {
+            type: String,
+            value: "Robot Vacuum and Paletizer"
+        },
+          unit4Description: {
+            type: String,
+            value: "Wrapper (End of Line)"
+        },
+           lastBagger1Count: {
+            type: Object,
+            observer: '_formatBagger1Count'
+        },
+        lastBagger2Count: {
+            type: Object,
+            observer: '_formatBagger2Count'
+        },
+        lastBagger1FaultStatus: {
+            type: Object,
+            observer: '_formatBagger1FaultStatus'
+        },
+        lastBagger1Status: {
+            type: Object,
+            observer: '_formatBagger1Status'
+        },
+        lastBagger2Status: {
+            type: Object,
+            observer: '_formatBagger2Status'
+        },
+        lastBagger2FaultStatus: {
+            type: Object,
+            observer: '_formatBagger2FaultStatus'
+        },
+          lastUnit1BPML: {
+            type: Object,
+            observer: '_formatBPML1'
+        },
+          lastUnit2BPML: {
+            type: Object,
+            observer: '_formatBPML2'
+        },
+          unit1BPM: {
+            type: String,
+            value: ""
+        },
+          unit2BPM: {
+            type: String,
+            value: ""
+        },
+      },
+      ready: function() {
+        var that = this;
+          this.lineData = [
+			{name: "Bagger 1", description: this.unit1Description, actual: this.bagger1Count, downtime: this.unit1DT, oee: this.unit1OEE, fault: this.bagger1FaultStatus, faultCode: this.bagger1FaultStatusCode, lineStatus: this.bagger1Status, productionGood: this.productionGood, productionMiddle: this.productionMiddle, productionBad: this.productionBad, productionTarget: this.unit1Target, unitsRejected: this.unit1Rejected, bpm: this.unit1BPM, equipmentType: "bagger"},
+      {name: "Bagger 2", description: this.unit2Description, actual: this.bagger2Count, downtime: this.unit2DT, oee: this.unit2OEE, fault: this.bagger2FaultStatus, faultCode: this.bagger2FaultStatusCode, lineStatus: this.bagger2Status, productionGood: this.productionGood, productionMiddle: this.productionMiddle, productionBad: this.productionBad, productionTarget: this.unit2Target, unitsRejected: this.unit2Rejected, bpm: this.unit2BPM, equipmentType: "bagger"},
+      {name: "Robot Vacuum", description: this.unit3Description, downtime: this.unit2DT, oee: this.unit1OEE},
+			{name: "Wrapper", description: this.unit4Description, downtime: this.unit2DT, oee: this.unit2OEE}
+
+        ];
+            this.$.getBagger1Count.generateRequest();
+            this.$.getBagger2Count.generateRequest();
+            this.$.getBagger1FaultStatus.generateRequest();
+            this.$.getBagger2FaultStatus.generateRequest();
+            this.$.getBPMUnit1.generateRequest();
+            this.$.getBPMUnit2.generateRequest();
+            this.$.getBagger1Status.generateRequest();
+            this.$.getBagger2Status.generateRequest();
+      },
+      _updateData: function() {
+        this.async(function() {
+            this.$.getBagger1Count.generateRequest();
+            this.$.getBagger2Count.generateRequest();
+            this.$.getBagger1FaultStatus.generateRequest();
+            this.$.getBagger2FaultStatus.generateRequest();
+            this.$.getBPMUnit1.generateRequest();
+            this.$.getBPMUnit2.generateRequest();
+            this.$.getBagger1Status.generateRequest();
+            this.$.getBagger2Status.generateRequest();
+            
+        }, 10000);
+          
+    },
+      _formatBagger1Count: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        //    console.log("Bagger 1 Current Count:" + JSON.stringify(raw));  
+
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.bagger1Count = series[0].y;
+        console.log("Bagger 1 Current Count Value:" + this.bagger1Count); 
+        
+       
+        }
+
+        this._updateData();
+    },
+    _formatBagger2Count: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+           // console.log("Line 2 Current Count:" + JSON.stringify(raw));  
+
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.bagger2Count = series[0].y;
+
+        this.Line1CountValue = this.bagger2Count + this.bagger1Count;
+       console.log("Bagger 2 Current Count Value:" + this.bagger2Count); 
+        
+       
+
+        }
+    },
+      _formatBPML1: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+           // console.log("Line 2 Current Count:" + JSON.stringify(raw));  
+
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.unit1BPM = series[0].y;        
+
+        }
+    },
+      _formatBPML2: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+           // console.log("Line 2 Current Count:" + JSON.stringify(raw));  
+
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.unit2BPM = series[0].y;        
+        console.log("Unit 2 BPM:" + this.unit2BPM);
+        console.log("Unit 1 BPM:" + this.unit1BPM);
+
+        this.lineBPM = this.unit2BPM + this.unit1BPM;
+      console.log("Line BPM:" + this.lineBPM);  
+      }
+    },
+      _formatBagger1FaultStatus: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.bagger1FaultStatusCode = series[0].y;
+        if (this.bagger1FaultStatusCode == 0){
+            this.bagger1FaultStatus = "No Fault";
+            this.bagger1FaultStatusCode = "0";
+        }
+         else if (this.bagger1FaultStatusCode == 1){
+            this.bagger1FaultStatus = "Bagger 1 - General Fault & Blocking";
+            this.bagger1FaultStatusCode = "1";
+        }
+        else if (this.bagger1FaultStatusCode == 2){
+            this.bagger1FaultStatus = "Bagger 1 - Warning";
+            this.bagger1FaultStatusCode = "2";
+        }
+        else {
+            this.bagger1FaultStatus = "Error Reading Fault"
+        }
+         }
+    },
+     _formatBagger2FaultStatus: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.bagger2FaultStatusCode = series[0].y;
+       // console.log("Bagger 2 Fault Status:" + this.Bagger2FaultStatusCode); 
+       // console.log("Bagger 1 Fault Status:" + this.Bagger1FaultStatusCode); 
+        if (this.bagger2FaultStatusCode == 0){
+            this.bagger2FaultStatus = "No Fault";
+            this.bagger2FaultStatusCode = "0";
+        }
+         else if (this.bagger2FaultStatusCode == 1){
+            this.bagger2FaultStatus = "Bagger 2 - General Fault & Blocking";
+            this.bagger2FaultStatusCode = "1";
+        }
+        else if (this.bagger2FaultStatusCode == 2){
+            this.bagger2FaultStatus = "Bagger 2 - Warning";
+            this.bagger2FaultStatusCode = "2";
+        }
+        else {
+            this.bagger2FaultStatus = "Error Reading Fault"
+        }
+
+        }
+    },
+       _formatBagger1Status: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.bagger1StatusCode = series[0].y;
+        console.log("Bagger 1 Status code:" + this.bagger1StatusCode); 
+
+        if (this.bagger1StatusCode == 0 ||  this.bagger1StatusCode == 1){
+            this.bagger1Status = "stopped";
+        }
+        else if (this.bagger1StatusCode == 9){
+
+            this.bagger1Status = "waiting";        
+        }
+        else {
+
+            this.bagger1Status = "running";        
+        }
+                console.log("Bagger 1 Status:" + this.bagger1Status); 
+
+         }
+    },
+    _formatBagger2Status: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.bagger2StatusCode = series[0].y;
+        console.log("Bagger 2 Status code:" + this.bagger2StatusCode); 
+
+        if (this.bagger2StatusCode == 0 ||  this.bagger2StatusCode == 1){
+            this.bagger2Status = "stopped";
+        }
+        else if (this.bagger2StatusCode == 9){
+
+            this.bagger2Status = "waiting";        
+        }
+        else {
+
+            this.bagger2Status = "running";        
+        }
+                console.log("Bagger 2 Status:" + this.bagger2Status); 
+
+         }
+            if((this.bagger1StatusCode !== 0 && this.bagger1StatusCode !== 1 && this.bagger1StatusCode !== 9) && (this.bagger2StatusCode !== 0 && this.bagger2StatusCode !== 1 && this.bagger2StatusCode !== 9)){
+                this.lineStatus = "All Units Running"
+            }
+            else if(this.bagger1StatusCode == 9 || this.bagger2StatusCode == 9){
+                this.lineStatus = "One or More Units Waiting"
+            }
+            else{
+                this.lineStatus = "One or More Units Stopped"
+            }
+
+        
+       this.lineData = [
+			{name: "Bagger 1", description: this.unit1Description, actual: this.bagger1Count, downtime: this.unit1DT, oee: this.unit1OEE, fault: this.bagger1FaultStatus, faultCode: this.bagger1FaultStatusCode, lineStatus: this.bagger1Status, productionGood: this.productionGood, productionMiddle: this.productionMiddle, productionBad: this.productionBad, productionTarget: this.unit1Target, unitsRejected: this.unit1Rejected, bpm: this.unit1BPM, equipmentType: "bagger"},
+      {name: "Bagger 2", description: this.unit2Description, actual: this.bagger2Count, downtime: this.unit2DT, oee: this.unit2OEE, fault: this.bagger2FaultStatus, faultCode: this.bagger2FaultStatusCode, lineStatus: this.bagger2Status, productionGood: this.productionGood, productionMiddle: this.productionMiddle, productionBad: this.productionBad, productionTarget: this.unit2Target, unitsRejected: this.unit2Rejected, bpm: this.unit2BPM, equipmentType: "bagger"},
+      {name: "Robot Vacuum", description: this.unit3Description, downtime: this.unit2DT, oee: this.unit1OEE},
+			{name: "Wrapper", description: this.unit4Description, downtime: this.unit2DT, oee: this.unit2OEE}
+
+        ];
+    this._updateData();
+    },
+    });
+  </script>
+</dom-module>

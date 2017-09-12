@@ -1,0 +1,113 @@
+.lineContainer{
+  display:flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  .lineWrapper.fault-1{
+    border: 3px solid #f34336;
+  }
+  .lineWrapper.fault-2{
+    border: 3px solid #FF8B3A;
+  }
+.status{
+        display: block;
+        position: inherit;
+        margin: 10px 20px 0;
+        padding: 10px 20px;
+        text-transform: uppercase;
+        width: 97%;
+        text-align: center;
+        margin-bottom: -10px;
+        min-height: auto;
+
+      }
+    px-modal{
+        display:block;
+        clear: both;
+        width: 100%;
+        margin-right: 40px;
+
+        .modal-trigger{
+            cursor: pointer;
+
+            .right-icon{
+                float:right;
+            }
+        }
+        .tagDataWrap{
+            display:block;
+            clear:both;
+            overflow: hidden;
+            width: 100%;
+            .tagList{
+                float:left;
+                display:block;
+                width: 38%;
+            }
+            .trendData{
+                float:left;
+                display:block;
+                width:62%;
+            }
+        }
+        .modal__buttons{
+            clear:both;
+            display:block;
+        }
+    }
+
+  .lineWrapper{
+    flex-grow: 1;
+    padding: 20px;
+    max-width: 100%;
+    margin: 10px 20px;
+    flex-basis: 100%;
+    overflow: hidden;
+    cursor: auto;
+    &:hover{
+      box-shadow: 1px 1px 5px #d8e0e5;
+
+    }
+
+    .lineDetail{
+      display:block;
+      padding: 5px 0;
+      float:left;
+      margin: 10px;
+      text-align: center;
+      min-width: 140px;
+      min-height: 180px;
+      width: 15%;
+
+      &.lineName{
+          margin: 5px 0;
+          padding: 0;
+          min-height: auto;
+      }
+      
+      
+    }
+    
+    .lineActual{
+        clear: left;
+    }
+    .lineTarget{
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
+    px-gauge{
+          max-width: 150px;
+          margin: 0 auto;
+      }
+        px-percent-circle{
+          max-width: 100px;
+          margin:0 auto;
+      }
+  }
+}
+.selectedLine{
+    font-weight: bold;
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid #d8e0e5;
+}

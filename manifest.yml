@@ -1,0 +1,11 @@
+---
+applications:
+  - name: ptchronos-uidemo-new
+    memory: 128M
+    timeout: 180
+    buildpack: nodejs_buildpack
+    command: node server/app.js
+    path: dist
+env:
+    node_env: cloud
+

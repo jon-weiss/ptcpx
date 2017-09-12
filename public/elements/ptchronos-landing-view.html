@@ -1,0 +1,750 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/px-card/px-card.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="../bower_components/px-vis-timeseries/px-vis-timeseries.html" />
+<link rel="import" href="../bower_components/px-data-table/px-data-table.html" />
+<link rel="import" href="../bower_components/px-datetime-picker/px-datetime-picker.html">
+<link rel="import" href="../elements/seed-app-styles.html" />
+
+<dom-module id="ptchronos-landing-view">
+  <template>
+    <style include="seed-app-styles"></style>
+    <div class="u-mh">
+<div class="lineContainer" id="linesData">
+  <iron-ajax 
+    id="getTags" 
+    url="/api/tsTags" 
+    last-response="{{lastTagResponse}}" 
+    on-response="onResponseToken" 
+    >
+  </iron-ajax>
+  <iron-ajax 
+    id="getBagger1Count" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger1Count}}" 
+    on-response="onResponseLine1Count" 
+    headers = '{"name":"PTChronos_L1.N7:19"}'
+    >
+  </iron-ajax>
+  <iron-ajax 
+    id="getBagger2Count" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger2Count}}" 
+    on-response="onResponseLine2Count" 
+    headers = '{"name":"PTChronos_L2.N7:19"}'
+    >
+  </iron-ajax>
+   <iron-ajax 
+    id="getBagger3Count" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger3Count}}" 
+    on-response="onResponseLine3Count" 
+    headers = '{"name":"PTChronos_L3.N100:6"}'
+    >
+  </iron-ajax>
+    <iron-ajax 
+    id="getBagger1FaultStatus" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger1FaultStatus}}" 
+    on-response="onResponseLine1FaultStatus" 
+    headers = '{"name":"PTChronos_L1.N7:11"}'
+    >
+    </iron-ajax>
+  <iron-ajax 
+    id="getBagger2FaultStatus" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger2FaultStatus}}" 
+    on-response="onResponseLine2FaultStatus" 
+     headers = '{"name":"PTChronos_L2.N7:11"}'
+    >
+  </iron-ajax>
+   <iron-ajax 
+    id="getBagger3FaultStatus" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger3FaultStatus}}" 
+    on-response="onResponseLine3FaultStatus" 
+     headers = '{"name":"PTChronos_L3.N7:0"}'
+    >
+  </iron-ajax>
+  <iron-ajax 
+    id="getBagger1Status" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger1Status}}" 
+    on-response="onResponseLine1Status" 
+     headers = '{"name":"PTChronos_L1.N7:1"}'
+    >
+  </iron-ajax>
+  <iron-ajax 
+    id="getBagger2Status" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger2Status}}" 
+    on-response="onResponseLine2Status" 
+     headers = '{"name":"PTChronos_L2.N7:1"}'
+    >
+  </iron-ajax>
+  <iron-ajax 
+    id="getTSData" 
+    url="/api/ts" 
+    last-response="{{lastTSDataResponse}}" 
+    headers$='{"name":"{{selectedTag}}"}'
+    method = "POST"
+    >
+  </iron-ajax>
+  <template is="dom-repeat" items="{{lineData}}"> 
+    <div class$="lineWrapper is-{{index}} fault-{{item.faultCode}}" on-click="_lineView">
+      <span class$="lineDetail {{item.lineStatus}} status">
+       <b>{{item.name}}</b>: {{item.lineStatus}}</status>
+      </span>
+      <span class="lineName lineDetail">
+        {{item.description}}
+      </span>
+      <span class="lineTarget lineDetail">
+        Target: {{item.productionTarget}}
+      </span>
+      <span class="lineActual lineDetail">
+        Actual: {{item.actual}}
+      </span>
+      <span class="lineDowntime lineDetail">
+        Downtime: {{item.downtime}} (mm:ss)
+      </span>
+      <span class="lineOEE lineDetail">
+        OEE: {{item.oee}}
+      </span>
+      <span class="lineFault lineDetail">
+        Fault: {{item.fault}}
+      </span>
+    </span>
+  </template>
+</div>
+<div class="timeSelection">
+           <div class="startDate">
+            <span class="label">
+                Start Time:
+            </span>
+            <px-datetime-picker id="startTime"
+                date-format="YYYY/MM/DD"
+                time-format="HH:mm:ss"
+                time-zone="Canada/Eastern"
+                show-time-zone="abbreviatedText"
+                date-time$="{{defaultStartTime}}">
+            </px-datetime-picker>
+            </div>
+            <div class="endDate">
+                <span class="label">
+                    End Time:
+                </span>
+                <px-datetime-picker id="endTime"
+                    date-format="YYYY/MM/DD"
+                    time-format="HH:mm:ss"
+                    time-zone="Canada/Eastern"
+                    show-time-zone="abbreviatedText"
+                    date-time$="{{defaultEndTime}}">
+                </px-datetime-picker>
+            </div>
+            <div class="submitSchedule">
+             <button on-click="dateChanged">Update</button>
+        </div>
+</div>
+<div class="home-bottom">
+  <div class="bottom-left section">
+    <px-data-table
+    table-data$="{{tagList}}"
+    language="en"
+    striped
+    filterable
+    sortable
+    selectable
+    single-select
+    include-all-columns>
+    </px-data-table>
+  </div>
+  <div class="bottom-right section">
+    <span class="tagTitle">
+      Selected Tag: {{selectedTag}}
+    </span>
+    <span class="tagValue" style="margin-left: 40px;">
+      Current Value: {{tagCurrentValue}}
+    </span>
+    <px-vis-timeseries 
+    debounce-resize-timing="250" 
+    width="473.3125" height="358" 
+    chart-horizontal-alignment="center" 
+    chart-vertical-alignment="center" 
+    margin='{"top":30,"bottom":60,"left":65,"right":65}' 
+    tooltip-config='{}' 
+    register-config='{"type":"vertical","width":200}' 
+    selection-type="xy" 
+    chart-data="{{tsChartData}}"
+    y-axis-config='{"title": "Values"}'
+    series-config='{"Value": {
+      "type":"line",
+      "x": "x",
+      "y": "y",
+      "yAxisUnit": ""
+    }}'
+    >
+    </px-vis-timeseries>
+  </div>
+</div>
+
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'ptchronos-landing-view',
+      properties: {},
+      ready: function() {
+        var that = this;  
+        var linesData = document.querySelector('#linesData');      
+         this.lineData = [
+			{lineNumber: 1, name: "Line 1", description: this.line1Description, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.Line1Target,},
+			{lineNumber: 2, name: "Line 2", description: this.line2Description, actual: this.Line2CountValue, downtime: this.line2DT, oee: this.line2OEE, fault: this.Line2FaultStatus, faultCode: this.Line2FaultStatusCode, lineStatus: this.Line2Status, productionTarget: this.Line2Target,}
+        ];
+            
+    var hrFromNow = new Date();
+       hrFromNow.setHours(hrFromNow.getHours() + 1);
+       var endTimeEpoch = new Date().getTime();
+       var friendlyEndTime = new Date(endTimeEpoch).toISOString();
+       this.defaultEndTime = friendlyEndTime;
+       this.etValue = endTimeEpoch;
+
+       var startTimeEpoch = new Date() - 720*60*1000;
+       var friendlyStartTime = new Date(startTimeEpoch).toISOString();
+       this.defaultStartTime = friendlyStartTime;
+       this.stValue = startTimeEpoch;
+       console.log("ST" + this.stValue);
+       console.log("ET" + this.etValue);
+
+            this.$.getTags.generateRequest();
+            this.$.getBagger1Count.generateRequest();
+            this.$.getBagger2Count.generateRequest();
+            this.$.getBagger3Count.generateRequest();
+            this.$.getBagger1FaultStatus.generateRequest();
+            this.$.getBagger2FaultStatus.generateRequest();
+            this.$.getBagger3FaultStatus.generateRequest();
+            this.$.getBagger1Status.generateRequest();
+            this.$.getBagger2Status.generateRequest();
+            function getCookie(cname) {
+                var name = cname + "=";
+                var decodedCookie = decodeURIComponent(document.cookie);
+                var ca = decodedCookie.split(';');
+                for(var i = 0; i <ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length, c.length);
+                    }
+                }
+                return "";
+            }
+        var startTime = getCookie("startTimeEpoch");
+        if (startTime != "") {
+            this.stValue = startTime;
+        } else {
+            }
+        var endTime = getCookie("endTimeEpoch");
+        if (endTime != "") {
+            this.etValue = endTime;
+        } else {
+            }
+        var startTimeFriendly = getCookie("startTime");
+        if (startTimeFriendly != "") {
+            this.globalStartTime = startTimeFriendly;
+            this.defaultStartTime = this.globalStartTime;
+        } else {
+            }
+        var endTimeFriendly = getCookie("endTime");
+        if (endTimeFriendly != "") {
+            this.globalEndTime = endTimeFriendly;
+            this.defaultEndTime = this.globalEndTime;
+        } else {
+            }
+
+      },
+    dateChanged: function(){
+        var stValue = $("#startTime")[0].dateTime;
+        var etValue = $("#endTime")[0].dateTime;
+
+        var newStartDate = new Date(stValue);
+        this.stValue= newStartDate.getTime();
+        var newEndDate = new Date(etValue); 
+        this.etValue= newEndDate.getTime();
+
+        console.log("Start" + this.stValue );
+        console.log("End" + this.etValue);
+
+        this.$.getTSData.headers['startTime'] = this.stValue;
+        this.$.getTSData.headers['endTime'] = this.etValue;
+        this.$.getTSData.generateRequest();
+        document.cookie = "startTimeEpoch=" + this.stValue;
+        document.cookie = "endTimeEpoch=" + this.etValue;
+        document.cookie = "startTime=" + $("#startTime")[0].dateTime;
+        document.cookie = "endTime=" + $("#endTime")[0].dateTime;
+
+        function getCookie(cname) {
+                var name = cname + "=";
+                var decodedCookie = decodeURIComponent(document.cookie);
+                var ca = decodedCookie.split(';');
+                for(var i = 0; i <ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length, c.length);
+                    }
+                }
+                return "";
+            }
+        var startTime = getCookie("startTimeEpoch");
+        if (startTime != "") {
+            this.stValue = startTime;
+        } else {
+            }
+        var endTime = getCookie("endTimeEpoch");
+        if (endTime != "") {
+            this.etValue = endTime;
+        } else {
+            }
+        var startTimeFriendly = getCookie("startTime");
+        if (startTimeFriendly != "") {
+            this.globalStartTime = startTimeFriendly;
+            this.defaultStartTime = this.globalStartTime;
+        } else {
+            }
+        var endTimeFriendly = getCookie("endTime");
+        if (endTimeFriendly != "") {
+            this.globalEndTime = endTimeFriendly;
+            this.defaultEndTime = this.globalEndTime;
+        } else {
+            }
+    },
+    listeners: {
+        'px-row-click': 'rowCliked',
+        'visible-items-changed' : '_routeChanged'
+    },
+    properties: {
+        lastTagResponse: {
+            type: Object,
+            observer: '_formatTags'
+        },
+        lastTSDataResponse: {
+            type: Object,
+            observer: '_formatTSData'
+        },
+        lastBagger1Count: {
+            type: Object,
+            observer: '_formatBagger1Count'
+        },
+        lastBagger2Count: {
+            type: Object,
+            observer: '_formatBagger2Count'
+        },
+        lastBagger3Count: {
+            type: Object,
+            observer: '_formatBagger3Count'
+        },
+        lastBagger1FaultStatus: {
+            type: Object,
+            observer: '_formatBagger1FaultStatus'
+        },
+        lastBagger1Status: {
+            type: Object,
+            observer: '_formatBagger1Status'
+        },
+        lastBagger2Status: {
+            type: Object,
+            observer: '_formatBagger2Status'
+        },
+        lastBagger2FaultStatus: {
+            type: Object,
+            observer: '_formatBagger2FaultStatus'
+        },
+        lastBagger3FaultStatus: {
+            type: Object,
+            observer: '_formatBagger3FaultStatus'
+        },
+        lastLine1CountValue: {
+            type: String
+        },
+        lastLine2CountValue: {
+            type: String
+        },
+        tokenValue: {
+            type: String,
+            value: ""
+        },
+        line1Description: {
+            type: String,
+            value: "Bagging Line 1"
+        },
+        line2Description: {
+            type: String,
+            value: "Bagging Line 2"
+        },
+        line1OEE: {
+            type: String,
+            value: "80%"
+        },
+        line2OEE: {
+            type: String,
+            value: "90%"
+        },
+        line1DT: {
+            type: String,
+            value: "03:20"
+        },
+        line2DT: {
+            type: String,
+            value: "04:20"
+        },
+        line1Target: {
+            type: String,
+            value: "2000"
+        },
+        line2Target: {
+            type: String,
+            value: "1000"
+        },
+        Line1Status: {
+            type: String,
+            value: "Loading..."
+        },
+        Line2Status: {
+            type: String,
+            value: "Loading..."
+        },
+        tagsValue: {
+            type: Object
+        },
+        selectedLine: {
+            type: String
+        },
+       
+    },
+    _routeChanged: function(newRoute) {
+        console.log('********new route:', newRoute);
+        if (newRoute.path !== '/home') {
+          var tsChart = document.querySelector('rmd-view timeseries-chart');
+          if (tsChart) {
+            tsChart.closeWebSocket();
+          }
+        }
+      },
+    _updateData: function() {
+        this.async(function() {
+            this.$.getBagger1Count.generateRequest();
+            this.$.getBagger2Count.generateRequest();
+            this.$.getBagger3Count.generateRequest();
+            this.$.getBagger1FaultStatus.generateRequest();
+            this.$.getBagger2FaultStatus.generateRequest();
+            this.$.getBagger3FaultStatus.generateRequest();
+            this.$.getBagger1Status.generateRequest();
+            this.$.getBagger2Status.generateRequest();
+        }, 10000);
+    },
+    _formatTags: function(raw) {
+        
+            this.tagsValue = raw;
+           
+
+        var series = [];
+        var tags = raw;
+        
+        tags.result.results.forEach(function(tag) {
+            if(tag.indexOf('PTChronos') == 0){
+          series.push({"val": tag});
+            }
+        });
+        this.tagList = series;
+    },
+        _formatTSData: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+            console.log("TS DATA:" + JSON.stringify(raw));  
+
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.tsChartData = series;
+        this.tagCurrentValue = series[count - 1].y;
+
+            }
+    },
+        rowCliked: function(e) {
+        console.log("a row was clicked!!");
+        var selection = e.detail.row.row.val.value;
+        this.selectedTag = selection;
+       // console.log(this.selectedTag);
+
+        this.$.getTSData.headers['startTime'] = this.stValue;
+        this.$.getTSData.headers['endTime'] = this.etValue;
+        this.$.getTSData.generateRequest();
+            
+      },
+    pageChanged: function(){
+        console.log("PAGE CHANGED");
+    },
+        _formatBagger1Count: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+            console.log("Line 1 Current Count:" + JSON.stringify(raw));  
+
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.bagger1Count = series[0].y;
+       // console.log("Line 1 Current Count Value:" + this.Line1CountValue); 
+        
+       
+        }
+
+       // this._updateData();
+    },
+    _formatBagger2Count: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+           // console.log("Line 2 Current Count:" + JSON.stringify(raw));  
+
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.bagger2Count = series[0].y;
+
+        this.Line1CountValue = this.bagger2Count + this.bagger1Count;
+       // console.log("Line 2 Current Count Value:" + this.Line2CountValue); 
+        
+        
+
+        }
+    },
+    _formatBagger3Count: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+           // console.log("Line 2 Current Count:" + JSON.stringify(raw));  
+
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.bagger3Count = series[0].y;
+
+        this.Line2CountValue = this.bagger3Count;
+       // console.log("Line 2 Current Count Value:" + this.Line2CountValue); 
+        
+        
+
+        }
+    },
+    _formatBagger1FaultStatus: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.Bagger1FaultStatusCode = series[0].y;
+         }
+    },
+     _formatBagger2FaultStatus: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.Bagger2FaultStatusCode = series[0].y;
+       // console.log("Bagger 2 Fault Status:" + this.Bagger2FaultStatusCode); 
+       // console.log("Bagger 1 Fault Status:" + this.Bagger1FaultStatusCode); 
+        if (this.Bagger1FaultStatusCode == 0 && this.Bagger2FaultStatusCode == 0){
+            this.Line1FaultStatus = "No Fault";
+            this.Line1FaultStatusCode = "0";
+        }
+        else if (this.Bagger1FaultStatusCode == 1  && this.Bagger2FaultStatusCode == 0){
+            this.Line1FaultStatus = "Bagger 1 - General Fault & Blocking";
+            this.Line1FaultStatusCode = "1";
+        }
+       else if (this.Bagger1FaultStatusCode == 2  && this.Bagger2FaultStatusCode == 0){
+            this.Line1FaultStatus = "Bagger 1 - Warning";
+            this.Line1FaultStatusCode = "2";
+        }
+         else if (this.Bagger1FaultStatusCode == 0  && this.Bagger2FaultStatusCode == 1){
+            this.Line1FaultStatus = "Bagger 2 - General Fault & Blocking";
+            this.Line1FaultStatusCode = "1";
+        }
+        else if (this.Bagger1FaultStatusCode == 0  && this.Bagger2FaultStatusCode == 2){
+            this.Line1FaultStatus = "Bagger 2 - Warning";
+            this.Line1FaultStatusCode = "2";
+        }
+        else if (this.Bagger1FaultStatusCode !== 0  && this.Bagger2FaultStatusCode !== 0){
+            this.Line1FaultStatus = "Bagger 1 & 2 Have Faults";
+            this.Line1FaultStatusCode = "1";
+        }
+        else {
+            this.Line1FaultStatus = "Error Reading Fault"
+        }
+
+        }
+    },
+    _formatBagger3FaultStatus: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.Bagger3FaultStatusCode = series[0].y;
+        console.log("Bagger 3 Fault Status:" + this.Bagger3FaultStatusCode); 
+
+        if (this.Bagger3FaultStatusCode == 0 ){
+            this.Line2FaultStatus = "No Fault";
+            this.Line2FaultStatusCode = "0";
+        }
+        else {
+            this.Line2FaultStatus = "Fault Detected";
+            this.Line2FaultStatusCode = "1";
+        
+        }
+         }
+    },
+    _formatBagger1Status: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.Bagger1StatusCode = series[0].y;
+        console.log("Bagger 1 Status code:" + this.Bagger1StatusCode); 
+
+        if (this.Bagger1StatusCode == 0 ||  this.Bagger1StatusCode == 1){
+            this.Bagger1Status = "stopped";
+        }
+        else if (this.Bagger1StatusCode == 9){
+
+            this.Bagger1Status = "waiting";        
+        }
+        else {
+
+            this.Bagger1Status = "running";        
+        }
+                console.log("Bagger 1 Status:" + this.Bagger1Status); 
+
+         }
+    },
+    _formatBagger2Status: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.Bagger2StatusCode = series[0].y;
+        console.log("Bagger 2 Status code:" + this.Bagger2StatusCode); 
+
+        if (this.Bagger2StatusCode == 0 ||  this.Bagger2StatusCode == 1){
+            this.Bagger2Status = "stopped";
+        }
+        else if (this.Bagger2StatusCode == 9){
+
+            this.Bagger2Status = "waiting";        
+        }
+        else {
+
+            this.Bagger2Status = "running";        
+        }
+                console.log("Bagger 2 Status:" + this.Bagger2Status); 
+
+         }
+            if((this.Bagger1StatusCode !== 0 && this.Bagger1StatusCode !== 1 && this.Bagger1StatusCode !== 9) && (this.Bagger2StatusCode !== 0 && this.Bagger2StatusCode !== 1 && this.Bagger2StatusCode !== 9)){
+                this.Line1Status = "running"
+            }
+            else if(this.Bagger1StatusCode == 9 || this.Bagger2StatusCode == 9){
+                this.Line1Status = "waiting"
+            }
+            else{
+                this.Line1Status = "stopped"
+            }
+
+            this.lineData = [
+			{lineNumber: 1, name: "Line 1", description: this.line1Description, target: this.Line1Target, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.line1Target},
+			{lineNumber: 2, name: "Line 2", description: this.line2Description, target: this.Line2Target, actual: this.Line2CountValue, downtime: this.line1DT, oee: this.line2OEE, fault: this.Line2FaultStatus, faultCode: this.Line2FaultStatusCode, lineStatus: this.Line2Status, productionTarget: this.line2Target}
+        ];
+
+        //this._updateData();
+    },
+    _lineView: function (event){
+    //$("#nav")[0].selectedRoute = ["ptchronos-line"+event.model.get('item').lineNumber];
+    //loadPage('ptchronos-line'+event.model.get('item').lineNumber);
+    var qry = "page?page=_line";
+            subMain = null;
+            return $.when(ajax_get(qry+event.model.get('item').lineNumber+".html")).done(results => {
+                if (results.status === 200) {
+                    var data = results.results;
+                    $("div#mainPageBody").empty().append(data);
+                    if (typeof subMain === 'function') {
+                        $.when(_delay()).done(result => {
+                            subMain();
+                        });
+                    }
+                }
+            });
+	//window.location.hash = "/ptchronos-line-"+event.model.get('item').lineNumber;
+   // console.log(event.model.get('item').lineNumber);
+    this.selectedLine = event.model.get('item').lineNumber;
+	  }
+    
+});
+  </script>
+</dom-module>

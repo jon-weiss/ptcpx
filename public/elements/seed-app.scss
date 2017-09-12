@@ -1,0 +1,188 @@
+// Settings
+@import "px-colors-design/_settings.colors.scss";
+
+// Generic
+@import "px-normalize-design/_generic.normalize.scss";
+@import "px-box-sizing-design/_generic.box-sizing.scss";
+@import "px-helpers-design/_generic.helpers.scss";
+
+// px-viewport configuration variables are documented in the px-viewport Readme.md:
+// https://github.com/predixdev/px-viewport-design
+$desk-wide-width: auto; // defaults to 100%
+$desk-wide-max-width: none; // defaults to 80rem
+$viewport-margin: 0; // defaults to auto
+
+// Base
+@import "px-viewport-design/_base.viewport.scss";
+@import "px-flexbox-design/_base.flexbox.scss";
+@import "px-headings-design/_base.headings.scss";
+
+// Meta
+@import "px-meta-lists-design/_meta.lists.scss";
+
+// Objects
+$inuit-enable-btn--bare     : true;
+
+// Need this font path for some reason, to prevent 404 errors in console.
+$fa-font-path: '../../bower_components/font-awesome/fonts';
+@import "px-buttons-design/_objects.buttons.scss";
+
+$inuit-enable-layout--small : true;
+$inuit-enable-layout--flush : true;
+$inuit-enable-layout--full  : true;
+
+@import "px-layout-design/_objects.layout.scss";
+
+
+.content-wrapper {
+  position: relative;
+  display: flex;
+}
+
+header > div.viewport {
+  margin: 0 15px;
+}
+
+main {
+  min-height: calc(100vh - #{calculateRem(120px)});
+  margin-left: 0;
+  background-color: #fff !important;
+  overflow-x: hidden;
+  flex: 1;
+}
+.lineContainer{
+  display:flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  .lineWrapper.fault-1{
+    border: 3px solid #f34336;
+  }
+  .lineWrapper.fault-2{
+    border: 3px solid #FF8B3A;
+  }
+  .status{
+        top: -20px;
+        right: 20px;
+        position: relative;
+        display: block;
+        margin: 0;
+        padding: 10px;
+        text-transform: uppercase;
+        width: 113%;
+        text-align: center;
+
+        &.running{
+          background: $yellow-green6;
+          color: #fff;
+        }
+        &.stopped{
+          background: $red7;
+          color: #fff;
+        }
+        &.waiting{
+          background: $yellow6;
+        }
+      }
+  .lineWrapper{
+    flex-grow: 1;
+    border: 1px solid $gray3;
+    box-shadow: 1px 1px 5px $gray3;
+    padding: 20px;
+    max-width: 300px;
+    margin: 10px;
+    transition: ease all .2s;
+    cursor: pointer;
+    &:hover{
+      box-shadow: 1px 1px 5px #555;
+    }
+    &.is-0{
+      margin: 10px 10px 10px 5px;
+    }
+    .lineDetail{
+      display:block;
+      padding: 5px 0;
+    }
+    .lineName{
+      font-weight: bold;
+      border-bottom: 1px solid $gray3;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      margin-top: -10px;
+    }
+  }
+}
+ .home-bottom{
+    display:flex;
+    .section{
+      flex-grow: 1;
+    }
+    .bottom-right{
+      margin-left: 30px;
+    }
+  }
+.timeSelection{
+  .startDate,.endDate{
+    display:block;
+    float:left;
+    min-width: 350px;
+  }
+  .endDate {
+    margin-left: 30px;
+  }
+  .label{
+    display: block;
+    padding-bottom: 10px;
+    font-size: 1rem;
+    color: #000;
+    padding-top: 5px;
+    float: left;
+    padding-right: 10px;
+  }
+  clear:both;
+  display:block;
+  overflow: hidden;
+  width: 100%;
+  margin: 10px 5px;
+
+  .submitSchedule{
+            display:block;
+            float: left;
+            width: 150px;
+        }
+        .submitSchedule button{
+            display: block;
+            height: 30px;
+            width: 100px;
+            text-align: center;
+            color: #fff;
+            border: none;
+            background: #086E87;
+            transition: ease all .3s;
+            margin: 0 auto;
+            font-size: 1rem;
+        }
+        .submitSchedule button:hover{
+            background: #1B2A33;
+            color: #fff;
+            transition: ease all .3s;
+        }
+}
+
+
+// Trumps
+$inuit-enable-margins--tiny             : true;
+$inuit-enable-margins--small            : true;
+$inuit-enable-margins--large            : true;
+$inuit-enable-margins--huge             : true;
+$inuit-enable-margins--none             : true;
+$inuit-enable-margins--rtl              : true;
+$inuit-enable-margins--negative-tiny    : true;
+$inuit-enable-paddings                  : true;
+$inuit-enable-paddings--tiny            : true;
+$inuit-enable-paddings--small           : true;
+$inuit-enable-paddings--large           : true;
+$inuit-enable-paddings--huge            : true;
+$inuit-enable-paddings--none            : true;
+
+@import "px-spacing-design/_trumps.spacing.scss";
+@import "px-widths-design/_trumps.widths.scss";

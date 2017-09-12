@@ -1,0 +1,100 @@
+<dom-module id="line-view-styles">
+<template>
+<style>
+.lineContainer {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row; }
+  .lineContainer .lineWrapper.fault-1 {
+    border: 3px solid #f34336; }
+  .lineContainer .lineWrapper.fault-2 {
+    border: 3px solid #FF8B3A; }
+  .lineContainer .status {
+    display: block;
+    position: inherit;
+    margin: 10px 20px 0;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    width: 97%;
+    text-align: center;
+    margin-bottom: -10px;
+    min-height: auto; }
+  .lineContainer px-modal {
+    display: block;
+    clear: both;
+    width: 100%;
+    margin-right: 40px; }
+    .lineContainer px-modal .modal-trigger {
+      cursor: pointer; }
+      .lineContainer px-modal .modal-trigger .right-icon {
+        float: right; }
+    .lineContainer px-modal .tagDataWrap {
+      display: block;
+      clear: both;
+      overflow: hidden;
+      width: 100%; }
+      .lineContainer px-modal .tagDataWrap .tagList {
+        float: left;
+        display: block;
+        width: 38%; }
+      .lineContainer px-modal .tagDataWrap .trendData {
+        float: left;
+        display: block;
+        width: 62%; }
+    .lineContainer px-modal .modal__buttons {
+      clear: both;
+      display: block; }
+  .lineContainer .lineWrapper {
+    -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1;
+    padding: 20px;
+    max-width: 100%;
+    margin: 10px 20px;
+    -ms-flex-preferred-size: 100%;
+        flex-basis: 100%;
+    overflow: hidden;
+    cursor: auto; }
+    .lineContainer .lineWrapper:hover {
+      box-shadow: 1px 1px 5px #d8e0e5; }
+    .lineContainer .lineWrapper .lineDetail {
+      display: block;
+      padding: 5px 0;
+      float: left;
+      margin: 10px;
+      text-align: center;
+      min-width: 140px;
+      min-height: 180px;
+      width: 15%; }
+      .lineContainer .lineWrapper .lineDetail.lineName {
+        margin: 5px 0;
+        padding: 0;
+        min-height: auto; }
+    .lineContainer .lineWrapper .lineActual {
+      clear: left; }
+    .lineContainer .lineWrapper .lineTarget {
+      width: 100%;
+      text-align: center;
+      display: block; }
+    .lineContainer .lineWrapper px-gauge {
+      max-width: 150px;
+      margin: 0 auto; }
+    .lineContainer .lineWrapper px-percent-circle {
+      max-width: 100px;
+      margin: 0 auto; }
+
+.selectedLine {
+  font-weight: bold;
+  width: 100%;
+  padding: 10px;
+  border-bottom: 1px solid #d8e0e5; }
+
+</style>
+</template>
+</dom-module>

@@ -1,0 +1,160 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/px-card/px-card.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../elements/line-view/line-view.html">
+<link rel="import" href="./line-view/line-view.html">
+
+<dom-module id="ptchronos-line-2">
+  <template>
+
+     <iron-ajax 
+    id="getBagger3FaultStatus" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger3FaultStatus}}" 
+    on-response="onResponseLine3FaultStatus" 
+     headers = '{"name":"PTChronos_L3.N7:0"}'
+    >
+  </iron-ajax>
+   <iron-ajax 
+    id="getBagger3Count" 
+    url="/api/latestTagValue" 
+    last-response="{{lastBagger3Count}}" 
+    on-response="onResponseLine3Count" 
+    headers = '{"name":"PTChronos_L3.N100:6"}'
+    >
+  </iron-ajax>
+
+    <line-view selected-line$="{{selectedLine}}" line-data$="{{lineData}}" line-status$="{{lineStatus}}"></line-view>          
+  </template>
+  <script>
+    Polymer({
+      is: 'ptchronos-line-2',
+      properties: {
+        selectedLine: {
+            type: String,
+            value: "2"
+        },
+          lineData: {
+            type: Object,
+            value: ""
+        },
+        productionGood: {
+            type: Number,
+            value: 1300
+        },
+          productionMiddle: {
+            type: Number,
+            value: 1300
+        },
+          productionBad: {
+            type: Number,
+            value: 700
+        },
+          productionTarget: {
+            type: Number,
+            value: 1500
+        },
+          unit1DT: {
+            type: String,
+            value: "03:20"
+        },
+          unit1OEE: {
+            type: String,
+            value: "80"
+        },
+          unit1Rejected: {
+            type: String,
+            value: "18"
+        },
+          unit1Description: {
+            type: String,
+            value: "First Bagger"
+        },
+          lastBagger3Count: {
+            type: Object,
+            observer: '_formatBagger3Count'
+        },
+
+        lastBagger3FaultStatus: {
+            type: Object,
+            observer: '_formatBagger3FaultStatus'
+        },
+      },
+      ready: function() {
+        var that = this;
+        this.lineData = [
+			{name: "Bagger", description: this.unit1Description, actual: this.bagger3Count, downtime: this.unit1DT, oee: this.unit1OEE, fault: this.bagger3FaultStatus, faultCode: this.bagger3FaultStatusCode, lineStatus: this.bagger3Status, productionGood: this.productionGood, productionMiddle: this.productionMiddle, productionBad: this.productionBad, productionTarget: this.productionTarget, unitsRejected: this.unit1Rejected, equipmentType: "bagger"},
+      {name: "Robot Vacuum", description: this.unit3Description, downtime: this.unit2DT, oee: this.unit1OEE},
+			{name: "Wrapper", description: this.unit3Description, downtime: this.unit2DT, oee: this.unit2OEE}
+
+        ];
+      this.$.getBagger3Count.generateRequest();
+      this.$.getBagger3FaultStatus.generateRequest();
+      
+      },
+      _updateData: function() {
+        this.async(function() {
+            this.$.getBagger3Count.generateRequest();
+            this.$.getBagger3FaultStatus.generateRequest();
+        }, 10000);
+          
+    },
+      _formatBagger3Count: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+           // console.log("Line 2 Current Count:" + JSON.stringify(raw));  
+
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.bagger3Count = series[0].y;
+
+        this.Line2CountValue = this.bagger3Count;
+       console.log("Line 2 Current Count Value:" + this.bagger3Count); 
+        }
+    },
+      _formatBagger3FaultStatus: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+        this.Bagger3FaultStatusCode = series[0].y;
+        console.log("Bagger 3 Fault Status:" + this.Bagger3FaultStatusCode); 
+
+        if (this.Bagger3FaultStatusCode == 0 ){
+            this.bagger3FaultStatus = "No Fault";
+            this.lineStatus = "All Machines running";
+            this.bagger3FaultStatusCode = "0";
+        }
+        else {
+            this.bagger3FaultStatus = "Fault Detected";
+            this.lineStatus = "Fault Detected";
+            this.bagger3FaultStatusCode = "1";
+        
+        }
+         }
+
+        this.lineData = [
+			{name: "Bagger", description: this.unit1Description, actual: this.bagger3Count, downtime: this.unit1DT, oee: this.unit1OEE, fault: this.bagger3FaultStatus, faultCode: this.bagger3FaultStatusCode, lineStatus: this.bagger3Status, productionGood: this.productionGood, productionMiddle: this.productionMiddle, productionBad: this.productionBad, productionTarget: this.productionTarget, unitsRejected: this.unit1Rejected, equipmentType: "bagger"},
+      {name: "Robot Vacuum", description: this.unit3Description, downtime: this.unit2DT, oee: this.unit1OEE},
+			{name: "Wrapper", description: this.unit3Description, downtime: this.unit2DT, oee: this.unit2OEE}
+
+        ];
+    this._updateData();
+    },
+    });
+  </script>
+</dom-module>
