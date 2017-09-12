@@ -41,7 +41,11 @@
     "px-meta-lists-design": "^1.0.1",
     "px-buttons-design": "^2.0.5",
     "px-spacing-design": "^1.0.2",
-    "px-widths-design": "^1.0.2"
+    "px-widths-design": "^1.0.2",
+    "px-helpers-design": "^1.0.7",
+    "px-normalize-design": "^1.0.2",
+    "px-box-sizing-design": "^1.0.2",
+    "px-layout-design": "^1.0.1"
   },
   "resolutions": {
     "app-localize-behavior": "^1.0.0",
