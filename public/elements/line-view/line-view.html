@@ -74,6 +74,7 @@
   <template is="dom-repeat" items="{{lineData}}"> 
       <template is="dom-if" if="{{checkForEquipmentType(item.equipmentType)}}">
       <px-modal
+            class="MyModalClass"
             btn-modal-positive="Close"
             btn-modal-negative=""
             modal-heading="{{item.name}} Production Details">
