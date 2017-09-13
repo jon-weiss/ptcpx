@@ -33,6 +33,8 @@ $inuit-enable-layout--full  : true;
 
 @import "px-layout-design/_objects.layout.scss";
 
+@import "px-iconography-design/_base.iconography.scss";
+
 
 .content-wrapper {
   position: relative;
@@ -49,6 +51,7 @@ main {
   background-color: #fff !important;
   overflow-x: hidden;
   flex: 1;
+  
 }
 .lineContainer{
   display:flex;
@@ -110,6 +113,23 @@ main {
       margin-top: -10px;
     }
   }
+
+  .px-modal-0 .modal__content.px-modal {
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    max-height: calc(88% - 1rem);
+    max-width: calc(100% - 1rem);
+    overflow: auto;
+    white-space: normal;
+    word-wrap: break-word;
+    background-color: white;
+    color: #2c404c;
+    box-shadow: 0 6px 12px 0 rgba(0,0,0,.2);
+    padding: 1.33333rem;
+}
+
 }
  .home-bottom{
     display:flex;
