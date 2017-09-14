@@ -245,27 +245,27 @@
         if (startTime != "") {
             this.stValue = startTime;
         } else {
-            document.cookie = "startTimeEpoch=" + this.stValue;
+            document.cookie = "startTimeEpoch=" + this.stValue + "; expires=" + cookieExpire;
             }
         var endTime = getCookie("endTimeEpoch");
         if (endTime != "") {
             this.etValue = endTime;
         } else {
-            document.cookie = "endTimeEpoch=" + this.etValue;
+            document.cookie = "endTimeEpoch=" + this.etValue + "; expires=" + cookieExpire;
             }
         var startTimeFriendly = getCookie("startTime");
         if (startTimeFriendly != "") {
             this.globalStartTime = startTimeFriendly;
             this.defaultStartTime = this.globalStartTime;
         } else {
-            document.cookie = "startTime=" + friendlyStartTime;
+            document.cookie = "startTime=" + friendlyStartTime + "; expires=" + cookieExpire;
             }
         var endTimeFriendly = getCookie("endTime");
         if (endTimeFriendly != "") {
             this.globalEndTime = endTimeFriendly;
             this.defaultEndTime = this.globalEndTime;
         } else {
-            document.cookie = "endTime=" + friendlyEndTime;
+            document.cookie = "endTime=" + friendlyEndTime + "; expires=" + cookieExpire;
             }
 
       },
@@ -284,10 +284,10 @@
         this.$.getTSData.headers['startTime'] = this.stValue;
         this.$.getTSData.headers['endTime'] = this.etValue;
         this.$.getTSData.generateRequest();
-        document.cookie = "startTimeEpoch=" + this.stValue;
-        document.cookie = "endTimeEpoch=" + this.etValue;
-        document.cookie = "startTime=" + $("#startTime")[0].dateTime;
-        document.cookie = "endTime=" + $("#endTime")[0].dateTime;
+        document.cookie = "startTimeEpoch=" + this.stValue + "; expires=" + cookieExpire;
+        document.cookie = "endTimeEpoch=" + this.etValue + "; expires=" + cookieExpire;
+        document.cookie = "startTime=" + $("#startTime")[0].dateTime + "; expires=" + cookieExpire;
+        document.cookie = "endTime=" + $("#endTime")[0].dateTime + "; expires=" + cookieExpire;
 
         function getCookie(cname) {
                 var name = cname + "=";
