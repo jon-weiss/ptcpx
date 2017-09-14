@@ -2,7 +2,7 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/px-dropdown/px-dropdown.html">
 <link rel="import" href="../bower_components/px-datetime-picker/px-datetime-picker.html">
-
+<link rel="import" href="./pxa-timeline-master/pxa-timeline.html">
 
 <dom-module id="scheduling-view">
   <template>
@@ -95,7 +95,12 @@
   <script>
     Polymer({
       is: 'scheduling-view',
-      properties: {},
+      properties: {
+          lastDowntimeData: {
+            type: Object,
+            observer: '_formatDowntimeData'
+        },
+      },
       listeners: {
         },
       ready: function() {
@@ -120,6 +125,10 @@
         this.etValue = $("#endTime")[0].dateTime;
         console.log("Start" + this.stValue );
         console.log("End" + this.etValue);
+    },
+    _formatDowntimeData: function(raw){
+        this.downtimeData = raw;
+        console.log("TESTING: " + JSON.stringify(this.downtimeData))
     }
     });
   </script>

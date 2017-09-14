@@ -52,8 +52,11 @@
             clear:both;
             display:block;
         }
+        
     }
-
+pxa-timeline div.pxa-timeline{
+            min-width: 700px;
+        }
   .lineWrapper{
     flex-grow: 1;
     padding: 20px;

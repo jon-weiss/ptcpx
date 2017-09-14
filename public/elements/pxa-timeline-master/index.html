@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="./pxa-timeline.html">
+    <link rel="import" href="./bower_components/polymer/polymer.html">
+    <link rel="import" href="./bower_components/iron-signals/iron-signals.html">
+</head>
+
+<body>
+    <div>
+        <h4>Case 1: Data is passed as attribute</h4>
+        <PRE><CODE>
+            &lt;pxa-timeline
+            timelineId="1"
+            timeline-start-date="2016-10-25T09:00:00.360Z"
+            timeline-end-date="2016-10-26T23:00:00.360Z"
+            data-source="attribute"
+            data='{"groups":[{"id":1,"content":"Group 1"},{"id":2,"content":"Group 2"},{"id":3,"content":"Group 3"}],"items":[{"id":1,"group":1,"start":"2016-10-25T19:41:48.009Z","end":"2016-10-25T21:10:23.379Z","content":"","color":"pink"},{"id":2,"group":1,"start":"2016-10-25T21:59:31.882Z","end":"2016-10-25T22:36:37.275Z","content":"","color":"blue"},{"id":3,"group":1,"start":"2016-10-25T23:41:46.263Z","end":"2016-10-26T00:28:51.186Z","content":"","color":"orange"},{"id":4,"group":1,"start":"2016-10-26T01:15:20.758Z","end":"2016-10-26T01:46:23.268Z","content":"","color":"purple"},{"id":5,"group":2,"start":"2016-10-25T19:35:16.082Z","end":"2016-10-25T20:08:57.821Z","content":"","color":"red"},{"id":6,"group":2,"start":"2016-10-25T21:15:36.833Z","end":"2016-10-25T21:56:40.014Z","content":"","color":"green"},{"id":7,"group":2,"start":"2016-10-25T22:48:44.802Z","end":"2016-10-25T23:20:05.619Z","content":"","color":"blue"},{"id":8,"group":2,"start":"2016-10-26T00:37:54.248Z","end":"2016-10-26T01:58:07.711Z","content":"","color":"orange"},{"id":9,"group":3,"start":"2016-10-25T19:14:10.472Z","end":"2016-10-25T20:21:05.316Z","content":"","color":"purple"},{"id":10,"group":3,"start":"2016-10-25T21:40:23.972Z","end":"2016-10-25T23:05:18.824Z","content":"","color":"red"},{"id":11,"group":3,"start":"2016-10-26T00:16:13.277Z","end":"2016-10-26T01:28:43.175Z","content":"","color":"green"},{"id":12,"group":3,"start":"2016-10-26T02:46:27.422Z","end":"2016-10-26T03:33:57.183Z","content":"","color":"blue"}]}'&gt;
+            &lt;/pxa-timeline&gt;
+            </CODE></PRE>
+        <pxa-timeline timeline-id="1" timeline-start-date="2016-10-25T09:00:00.360Z" timeline-end-date="2016-10-26T23:00:00.360Z" data-source="attribute" data='{"groups":[{"id":1,"content":"Group 1"},{"id":2,"content":"Group 2"},{"id":3,"content":"Group 3"}],"items":[{"id":1,"group":1,"start":"2016-10-25T19:41:48.009Z","end":"2016-10-25T21:10:23.379Z","content":"","color":"pink"},{"id":2,"group":1,"start":"2016-10-25T21:59:31.882Z","end":"2016-10-25T22:36:37.275Z","content":"","color":"blue"},{"id":3,"group":1,"start":"2016-10-25T23:41:46.263Z","end":"2016-10-26T00:28:51.186Z","content":"","color":"orange"},{"id":4,"group":1,"start":"2016-10-26T01:15:20.758Z","end":"2016-10-26T01:46:23.268Z","content":"","color":"purple"},{"id":5,"group":2,"start":"2016-10-25T19:35:16.082Z","end":"2016-10-25T20:08:57.821Z","content":"","color":"red"},{"id":6,"group":2,"start":"2016-10-25T21:15:36.833Z","end":"2016-10-25T21:56:40.014Z","content":"","color":"green"},{"id":7,"group":2,"start":"2016-10-25T22:48:44.802Z","end":"2016-10-25T23:20:05.619Z","content":"","color":"blue"},{"id":8,"group":2,"start":"2016-10-26T00:37:54.248Z","end":"2016-10-26T01:58:07.711Z","content":"","color":"orange"},{"id":9,"group":3,"start":"2016-10-25T19:14:10.472Z","end":"2016-10-25T20:21:05.316Z","content":"","color":"purple"},{"id":10,"group":3,"start":"2016-10-25T21:40:23.972Z","end":"2016-10-25T23:05:18.824Z","content":"","color":"red"},{"id":11,"group":3,"start":"2016-10-26T00:16:13.277Z","end":"2016-10-26T01:28:43.175Z","content":"","color":"green"},{"id":12,"group":3,"start":"2016-10-26T02:46:27.422Z","end":"2016-10-26T03:33:57.183Z","content":"","color":"blue"}]}'></pxa-timeline>
+        <br>
+        <br>
+    </div>
+    <hr>
+
+    <div>
+        <h4>Case 2: Data is passed as url, Start and end dates are passed</h4>
+        <PRE><CODE>
+            &lt;pxa-timeline
+            timelineId="2"
+            timeline-start-date="2016-10-25T09:00:00.360Z"
+            timeline-end-date="2016-10-26T23:00:00.360Z"
+            data-source="url"
+            data="https://predix-nodejs-dataserver-bw.run.aws-usw02-pr.ice.predix.io/getdata/timeline"&gt;
+            &lt;/pxa-timeline&gt;
+            </CODE></PRE>
+        <pxa-timeline timeline-id="2" timeline-start-date="2016-10-25T09:00:00.360Z" timeline-end-date="2016-10-26T23:00:00.360Z" data-source="url" data="https://predix-nodejs-dataserver-bw.run.aws-usw02-pr.ice.predix.io/getdata/timeline"></pxa-timeline>
+        <br>
+        <br>
+    </div>
+    <hr>
+
+    <div>
+        <h4>Case 3: Start date is passed and end date is not passed, timeline is contained to start date and last order</h4>
+        <PRE><CODE>
+            &lt;pxa-timeline
+            timelineId="3"
+            timeline-start-date="2016-10-25T09:00:00.360Z"
+            data-source="url"
+            data="https://predix-nodejs-dataserver-bw.run.aws-usw02-pr.ice.predix.io/getdata/timeline"&gt;
+            &lt;/pxa-timeline&gt;
+            </CODE></PRE>
+        <pxa-timeline timeline-id="3" timeline-start-date="2016-10-25T09:00:00.360Z" data-source="url" data="https://predix-nodejs-dataserver-bw.run.aws-usw02-pr.ice.predix.io/getdata/timeline"></pxa-timeline>
+        <br>
+        <br>
+    </div>
+    <hr>
+
+    <div>
+        <h4>Case 4: Start date is not passed and end date is passed, timeline is contained to first order and end date</h4>
+        <PRE><CODE>
+            &lt;pxa-timeline
+            timelineId="4"
+            timeline-end-date="2016-10-26T23:00:00.360Z"
+            data-source="url"
+            data="https://predix-nodejs-dataserver-bw.run.aws-usw02-pr.ice.predix.io/getdata/timeline"&gt;
+            &lt;/pxa-timeline&gt;
+            </CODE></PRE>
+        <pxa-timeline timeline-id="4" timeline-end-date="2016-10-26T23:00:00.360Z" data-source="url" data="https://predix-nodejs-dataserver-bw.run.aws-usw02-pr.ice.predix.io/getdata/timeline"></pxa-timeline>
+        <br>
+        <br>
+    </div>
+    <hr>
+
+    <div>
+        <h4>Case 5: Start and end dates are not passed, timeline is contained to first and last orders</h4>
+        <PRE><CODE>
+            &lt;pxa-timeline
+            timelineId="5"
+            data-source="url"
+            data="https://predix-nodejs-dataserver-bw.run.aws-usw02-pr.ice.predix.io/getdata/timeline"&gt;
+            &lt;/pxa-timeline&gt;
+            </CODE></PRE>
+        <pxa-timeline timeline-id="5" data-source="url" data="https://predix-nodejs-dataserver-bw.run.aws-usw02-pr.ice.predix.io/getdata/timeline"></pxa-timeline>
+        <br>
+        <br>
+    </div>
+
+    <template is="dom-bind" id="my-app">
+        <iron-signals on-iron-signal-edit="_handleEditClick"></iron-signals>
+        <iron-signals on-iron-signal-delete="_handleDeleteClick"></iron-signals>
+    </template>
+
+
+</body>
+
+<!--script>
+    setInterval(function() {
+        const el = document.querySelector('pxa-timeline');
+        el.timelineStartDate = "2016-10-21T09:00:00.360Z";
+        el.timelineEndDate = "2016-10-28T23:00:00.360Z";
+    }, 3000);
+
+</script-->
+
+<script>
+    document.querySelector("#my-app")._handleEditClick = function(event) {
+        alert("Edit clicked on item " + event.detail);
+    }
+
+    document.querySelector("#my-app")._handleDeleteClick = function(event) {
+        alert("Delete clicked on item " + event.detail);
+    }
+
+</script>
+
+
+</html>

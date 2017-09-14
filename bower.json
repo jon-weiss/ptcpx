@@ -47,7 +47,9 @@
     "px-box-sizing-design": "^1.0.2",
     "px-layout-design": "^1.0.1",
     "px-icon-set": "^2.0.10",
-    "px-iconography-design": "^1.0.3"
+    "px-iconography-design": "^1.0.3",
+    "paper-icon-button": "^2.0.1",
+    "iron-signals": "^1.0.3"
   },
   "resolutions": {
     "app-localize-behavior": "^1.0.0",

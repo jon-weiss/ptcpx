@@ -174,6 +174,43 @@ module.exports = function(app) {
 		.catch(function () {
      		console.log("Last Position: Promise Rejected");
 		});
+	});
+	
+	app.use('/api/downtime', function(req,res) {
+        //var selectedTagName = req.headers.name;
+		var tsQuery = {
+  			"groups": [
+				{"id": 1, "displayname": "Bagger 1", "tag": "PTChronos_L1.calc.downtime"},
+				{"id": 2, "displayname": "Bagger 2", "tag": "PTChronos_L2.calc.downtime"}
+			],
+  			"range": { "start": 1505310002020, "end": 1505316552020 }
+		};
+		var options = {
+			method: 'POST',
+			url: 'https://pxa-timeline-ms.run.aws-usw02-pr.ice.predix.io/getdowntime',
+			headers : { 
+                authorization: 'bearer '+tokenDetails.access_token,
+				'Content-Type': 'application/json'
+            },
+            json: tsQuery           
+		};
+		request(options).then(reqResult =>
+      {
+        if ((!reqResult) || (reqResult.items.length === 0) )
+        {
+		  console.log("Downtimw Data: Error");
+        }
+        else
+        {
+		 // console.log("Last Position: " + JSON.stringify(reqResult.tags[0].results[0].values) );
+		}
+        return res.json(
+					reqResult
+                );
+	  })
+		.catch(function () {
+     		console.log("Last Position: Promise Rejected");
+		});
     });
     
 	app.use('/api/asset', function(req,res) {

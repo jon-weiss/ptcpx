@@ -1,0 +1,197 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="stylesheet" href="./css/vis.min.css">
+<link rel="stylesheet" href="./css/custom_styles.css">
+<script src="./scripts/vis.min.js"></script>
+
+<dom-module id="pxa-timeline">
+    <style>
+         :host {}
+
+        .vis-item.vis-point.vis-selected,
+        .vis-item.vis-selected {
+            color: #FFFFFF !important;
+            border-width: 5px !important;
+            border-color: #515256 !important;
+        }
+
+    </style>
+
+    <template>
+        <template is="dom-if" if="{{_isDataSourceUrl(dataSource)}}">
+            <iron-ajax auto url={{data}} handle-as="json" on-response="handleResponse" last-response={{_timelineResponse}}>
+            </iron-ajax>
+        </template>
+    <div id$="timelineContainer_[[timelineId]]" style="min-width: 750px;"></div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'pxa-timeline',
+            properties: {
+                timelineId: {
+                    type: String,
+                    value: 0
+                },
+                timelineStartDate: String,
+                timelineEndDate: String,
+                dataSource: String,
+                data: Object,
+                selectedItem: String
+            },
+            observers: [
+                '_renderTimeline(data)'
+            ],
+            ready: function() {},
+            handleResponse: function() {
+                this.data = this._timelineResponse;
+            },
+            _isDataSourceUrl: function(dataSource) {
+                if (dataSource === "url")
+                    return true;
+                else if (dataSource === "attribute")
+                    return false;
+            },
+            _renderTimeline: function(data) {
+                if (this.data.hasOwnProperty('items')) {
+                    var len = 0;
+                    while (len < this.data.items.length) {
+
+                        //add css style property to add color to indivigual items
+                        if(!this.data.items[len].color){
+                            this.data.items[len].style = "border-color: #46AD00" + "; background-color: #46AD00;";
+                        }
+                        else{ 
+                        this.data.items[len].style = "border-color: #D1D0D8" + "; background-color: " + this.data.items[len].color + ";";
+                        }
+                    len++;
+                    }
+
+                    // create groups
+                    var groups = new vis.DataSet(this.data.groups);
+
+                    // create items
+                    var items = new vis.DataSet(this.data.items);
+
+                    // specify vis timeline options
+                    var options = {
+                        stack: false,
+                        start: (this.timelineStartDate == null) ? null : new Date(this.timelineStartDate),
+                        end: (this.timelineEndDate == null) ? null : new Date(this.timelineEndDate),
+                        showCurrentTime: false,
+                        margin: {
+                            item: 10, // minimal margin between items
+                            axis: 5 // minimal margin between items and the axis
+                        },
+                        orientation: 'top'
+                    };
+
+                    // create timeline
+                    var container = Polymer.dom(this.root).querySelector('#timelineContainer_' + this.timelineId);
+                    container.innerHTML = "";
+
+                    timeline = new vis.Timeline(container, null, options);
+                    timeline.setGroups(groups);
+                    timeline.setItems(items);
+                    var me = this;
+
+                    container.onclick = function(event) {
+                        var obj = timeline.getEventProperties(event)
+                        if (obj.what === "item") {
+
+                            //set selected item
+                            var selectedItem = obj.item;
+
+                            //remove any existing edit and delete buttons on clicking an item
+                            if (Polymer.dom(me.root).querySelector("#customButtonContainer_" + me.timelineId) != null) {
+                                Polymer.dom(me.root).querySelector("#customButtonContainer_" + me.timelineId).remove();
+                            }
+
+                            //prototype to insert after
+                            Node.prototype.insertAfter = function(newNode, referenceNode) {
+                                return referenceNode.parentNode.insertBefore(
+                                    newNode, referenceNode.nextSibling);
+                            };
+
+                            //getting required handles
+                            var refElem = container.getElementsByClassName("vis-selected")[0].getElementsByClassName("vis-item-overflow")[0];
+
+                            //var refElem = document.getElementById("timelineContainer");
+                            var parent = refElem.parentNode;
+
+                            //creating container div for edit and delete buttons
+                            var customButtonContainer = document.createElement("div");
+                            customButtonContainer.setAttribute("id", "customButtonContainer_" + me.timelineId);
+                            customButtonContainer.setAttribute("class", "vis-delete");
+                            parent.insertAfter(customButtonContainer, refElem);
+
+                            //changing reference element to newly created container
+                            refElem = document.getElementById("customButtonContainer_" + me.timelineId);
+
+                            //creating edit button
+                            var actionButton = document.createElement("paper-icon-button");
+                            actionButton.setAttribute("icon", "create");
+                            actionButton.setAttribute("title", "Edit this item");
+                            actionButton.setAttribute("class", "itemActionButton");
+                            actionButton.setAttribute("id", "editButton_" + me.timelineId);
+                            actionButton.setAttribute("style", "vertical-align: -webkit-baseline-middle");
+                            refElem.appendChild(actionButton);
+
+                            //creating delete button
+                            actionButton = document.createElement("paper-icon-button");
+                            actionButton.setAttribute("icon", "delete");
+                            actionButton.setAttribute("title", "Delete this item");
+                            actionButton.setAttribute("class", "itemActionButton");
+                            actionButton.setAttribute("id", "deleteButton_" + me.timelineId);
+                            actionButton.setAttribute("style", "vertical-align: -webkit-baseline-middle");
+                            refElem.appendChild(actionButton);
+
+                            //fire iron signal on edit button click
+                            document.getElementById('editButton_' + me.timelineId).onclick = function() {
+                                this.fire('iron-signal', {
+                                    name: 'edit',
+                                    data: selectedItem
+                                });
+                            }
+
+                            //fire iron signal on delete button click
+                            document.getElementById('deleteButton_' + me.timelineId).onclick = function() {
+                                this.fire('iron-signal', {
+                                    name: 'delete',
+                                    data: selectedItem
+                                });
+                            }
+
+                        } else {
+                            Element.prototype.remove = function() {
+                                this.parentElement.removeChild(this);
+                            }
+
+                            //prototype to remove by id
+                            NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+                                for (var i = this.length - 1; i >= 0; i--) {
+                                    if (this[i] && this[i].parentElement) {
+                                        this[i].parentElement.removeChild(this[i]);
+                                    }
+                                }
+                            }
+
+                            //remove any existing edit and delete buttons on clicking timeline background
+                            if (document.getElementById("customButtonContainer_" + me.timelineId) != null)
+                                document.getElementById("customButtonContainer_" + me.timelineId).remove();
+                            if (document.getElementById("customButtonContainer_" + me.timelineId) != null)
+                                document.getElementById("customButtonContainer_" + me.timelineId).remove();
+
+                            //clear selected item on timeline drag
+                            timeline.setSelection([]);
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
+</dom-module>

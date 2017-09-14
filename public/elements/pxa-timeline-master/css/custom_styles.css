@@ -1,0 +1,28 @@
+.vis-item.vis-point.vis-selected,
+.vis-item.vis-selected {
+  color: #FFFFFF !important;
+  border-width: 5px !important;
+  border-color: #0A9EC1 !important;
+  border-radius: 5px;
+  margin-top: -4px;
+}.vis-delete {
+    background-image: none !important;
+    color: black !important;
+    width: 68px !important;
+    right: -78px !important;
+    margin-top: -4px;
+}
+
+paper-icon-button.itemActionButton {
+    color: white;
+    background-color: black;
+    border-radius: 20px;
+    width: 32px;
+    height: 32px;
+    margin-top:2px;
+}
+
+paper-icon-button.itemActionButton:hover {
+    color: white;
+    background-color: #0A9EC1;
+}

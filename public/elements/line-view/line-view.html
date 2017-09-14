@@ -164,6 +164,12 @@
         </px-gauge>
       </span>
       <span class="lineDowntime lineDetail">
+           <px-modal
+            class="MyModalClass"
+            btn-modal-positive="Close"
+            btn-modal-negative=""
+            modal-heading="Downtime Details">
+            <div class="modal-trigger">
         Downtime:
         <px-percent-circle
         val="4"
@@ -171,6 +177,9 @@
         thickness="30">
         </px-percent-circle>
     {{item.downtime}} (mm:ss)
+    </div>
+        <pxa-timeline timeline-start-date="{{globalStartTime}}" timeline-end-date="{{globalEndTime}}" data-source="url" data="/api/downtime"></pxa-timeline>
+           </px-modal>
       </span>
     <span class="lineReject lineDetail">
         Units Rejected:
@@ -278,6 +287,10 @@
         document.cookie = "endTimeEpoch=" + this.etValue;
         document.cookie = "startTime=" + $("#startTime")[0].dateTime;
         document.cookie = "endTime=" + $("#endTime")[0].dateTime;
+        var friendlyEndTime = new Date(this.etValue).toISOString();
+       this.globalEndTime = friendlyEndTime;
+       var friendlyStartTime = new Date(this.stValue).toISOString();
+       this.globalStartTime = friendlyStartTime;
     },
     checkForEquipmentType: function(equipmentType){
 		return equipmentType == "bagger";
