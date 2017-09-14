@@ -14,6 +14,14 @@
 
 <dom-module id="line-view">
   <template>
+       <iron-ajax 
+    id="getDowntime" 
+    url="/api/downtime" 
+    last-response="{{lastDowntimeData}}" 
+    on-response="onResponseLine1FaultStatus" 
+    headers = ''
+    >
+    </iron-ajax> 
       <iron-ajax 
     id="getTSData" 
     url="/api/ts" 
@@ -178,7 +186,7 @@
         </px-percent-circle>
     {{item.downtime}} (mm:ss)
     </div>
-        <pxa-timeline timeline-start-date="{{globalStartTime}}" timeline-end-date="{{globalEndTime}}" data-source="url" data="/api/downtime"></pxa-timeline>
+        <pxa-timeline timeline-start-date="{{globalStartTime}}" timeline-end-date="{{globalEndTime}}" data-source="object" data="{{downtimeData}}"></pxa-timeline>
            </px-modal>
       </span>
     <span class="lineReject lineDetail">
@@ -214,6 +222,7 @@
       ready: function() {
         var that = this;  
         this.$.getTags.generateRequest();
+        this.$.getDowntime.generateRequest();
 
         var hrFromNow = new Date();
         hrFromNow.setHours(hrFromNow.getHours() + 1);
@@ -291,7 +300,10 @@
        this.globalEndTime = friendlyEndTime;
        var friendlyStartTime = new Date(this.stValue).toISOString();
        this.globalStartTime = friendlyStartTime;
-    },
+       this.set('globalStartTime', friendlyStartTime)
+        this.$.getDowntime.generateRequest();
+
+       },
     checkForEquipmentType: function(equipmentType){
 		return equipmentType == "bagger";
 	  },
@@ -321,7 +333,8 @@
         },
         globalStartTime: {
             type: String,
-            value: ""
+            value: "",
+            notify: true
         },
         globalEndTime: {
             type: String,
@@ -338,6 +351,10 @@
         lastTSDataResponse: {
             type: Object,
             observer: '_formatTSData'
+        },
+        lastDowntimeData: {
+            type: Object,
+            observer: '_formatDowntimeData'
         },
         
     },
@@ -424,7 +441,10 @@
                 this.tagList = [];
                 this.tsChartData = [];
             }
-        }
+        },
+        _formatDowntimeData: function(raw){
+        this.downtimeData = raw;
+    }
 
         
 });
