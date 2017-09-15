@@ -280,7 +280,7 @@
     dateChanged: function(){
         var stValue = $("#startTime")[0].dateTime;
         var etValue = $("#endTime")[0].dateTime;
-        var cookieExpire = new Date().getTime() + 24*60*60*1000;
+        this.cokieExpire = new Date().getTime() + 24*60*60*1000;
 
         var newStartDate = new Date(stValue);
         this.stValue= newStartDate.getTime();
@@ -293,10 +293,10 @@
         this.$.getTSData.headers['startTime'] = this.stValue;
         this.$.getTSData.headers['endTime'] = this.etValue;
         this.$.getTSData.generateRequest();
-        document.cookie = "startTimeEpoch=" + this.stValue + "; expires=" + cookieExpire;
-        document.cookie = "endTimeEpoch=" + this.etValue + "; expires=" + cookieExpire;
-        document.cookie = "startTime=" + $("#startTime")[0].dateTime + "; expires=" + cookieExpire;
-        document.cookie = "endTime=" + $("#endTime")[0].dateTime + "; expires=" + cookieExpire;
+        document.cookie = "startTimeEpoch=" + this.stValue + "; expires=" + this.cookieExpire;
+        document.cookie = "endTimeEpoch=" + this.etValue + "; expires=" + this.cookieExpire;
+        document.cookie = "startTime=" + $("#startTime")[0].dateTime + "; expires=" + this.cookieExpire;
+        document.cookie = "endTime=" + $("#endTime")[0].dateTime + "; expires=" + this.cookieExpire;
         var friendlyEndTime = new Date(this.etValue).toISOString();
        this.globalEndTime = friendlyEndTime;
        var friendlyStartTime = new Date(this.stValue).toISOString();
