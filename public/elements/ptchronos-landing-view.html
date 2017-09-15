@@ -94,8 +94,9 @@
   <template is="dom-repeat" items="{{lineData}}"> 
     <div class$="lineWrapper is-{{index}} fault-{{item.faultCode}}" on-click="_lineView">
       <span class$="lineDetail {{item.lineStatus}} status">
-       <b>{{item.name}}</b>: {{item.lineStatus}}</status>
+       <b>{{item.name}}</b>: {{item.lineStatus}}
       </span>
+    <div class="lineDetailsBox">
       <span class="lineName lineDetail">
         {{item.description}}
       </span>
@@ -114,9 +115,11 @@
       <span class="lineFault lineDetail">
         Fault: {{item.fault}}
       </span>
-    </span>
-  </template>
+    </div>
 </div>
+
+  </template>
+
 <div class="timeSelection">
            <div class="startDate">
             <span class="label">

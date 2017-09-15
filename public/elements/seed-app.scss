@@ -64,14 +64,8 @@ main {
     border: 3px solid #FF8B3A;
   }
   .status{
-        top: -20px;
-        right: 20px;
-        position: relative;
-        display: block;
-        margin: 0;
-        padding: 10px;
+        
         text-transform: uppercase;
-        width: 115%;
         text-align: center;
 
         &.running{
@@ -88,13 +82,15 @@ main {
       }
   .lineWrapper{
     flex-grow: 1;
-    border: 1px solid $gray3;
     box-shadow: 1px 1px 5px $gray3;
-    padding: 20px;
-    max-width: 300px;
-    margin: 10px;
+    border: 1px solid $gray3;
     transition: ease all .2s;
+    margin: 10px;
     cursor: pointer;
+    .lineDetailsBox{
+      padding: 20px;
+      //max-width: 300px;
+    }
     &:hover{
       box-shadow: 1px 1px 5px #555;
     }
@@ -113,8 +109,6 @@ main {
       margin-top: -10px;
     }
   }
-
-
 }
  .home-bottom{
     display:flex;
@@ -148,7 +142,6 @@ main {
   overflow: hidden;
   width: 100%;
   margin: 10px 5px;
-
   .submitSchedule{
             display:block;
             float: left;
