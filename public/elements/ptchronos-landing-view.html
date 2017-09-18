@@ -91,6 +91,14 @@
     method = "POST"
     >
   </iron-ajax>
+<iron-ajax 
+    id="getBPMUnit1" 
+    url="/api/latestTagValue" 
+    last-response="{{lastUnit1BPML}}" 
+    on-response="onResponseLine2Status" 
+     headers = '{"name":"PTChronos_L1.calc.bpm"}'
+    >
+  </iron-ajax>
   <template is="dom-repeat" items="{{lineData}}"> 
     <div class$="lineWrapper is-{{index}} fault-{{item.faultCode}}" on-click="_lineView">
       <span class$="lineDetail {{item.lineStatus}} status">
@@ -101,16 +109,17 @@
         {{item.description}}
       </span>
       <span class="lineTarget lineDetail">
-        Target: {{item.productionTarget}}
+        <!-- Target: {{item.productionTarget}} -->
+        Bags Per Minute: {{item.bpm}}
       </span>
       <span class="lineActual lineDetail">
-        Actual: {{item.actual}}
+        Total Bag Count: {{item.actual}}
       </span>
       <span class="lineDowntime lineDetail">
-        Downtime: {{item.downtime}} (mm:ss)
+        <!-- Downtime: {{item.downtime}} (mm:ss) -->
       </span>
       <span class="lineOEE lineDetail">
-        OEE: {{item.oee}}
+        <!-- OEE: {{item.oee}} -->
       </span>
       <span class="lineFault lineDetail">
         Fault: {{item.fault}}
@@ -201,7 +210,7 @@
         var that = this;  
         var linesData = document.querySelector('#linesData');      
          this.lineData = [
-			{lineNumber: 1, name: "Line 1", description: this.line1Description, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.Line1Target,},
+			{lineNumber: 1, name: "Line 1", description: this.line1Description, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.Line1Target, bpm: this.unit1BPM},
 			{lineNumber: 2, name: "Line 2", description: this.line2Description, actual: this.Line2CountValue, downtime: this.line2DT, oee: this.line2OEE, fault: this.Line2FaultStatus, faultCode: this.Line2FaultStatusCode, lineStatus: this.Line2Status, productionTarget: this.Line2Target,}
         ];
             
@@ -223,11 +232,13 @@
             this.$.getBagger1Count.generateRequest();
             this.$.getBagger2Count.generateRequest();
             this.$.getBagger3Count.generateRequest();
+            this.$.getBPMUnit1.generateRequest();
             this.$.getBagger1FaultStatus.generateRequest();
             this.$.getBagger2FaultStatus.generateRequest();
             this.$.getBagger3FaultStatus.generateRequest();
             this.$.getBagger1Status.generateRequest();
             this.$.getBagger2Status.generateRequest();
+
             function getCookie(cname) {
                 var name = cname + "=";
                 var decodedCookie = decodeURIComponent(document.cookie);
@@ -432,6 +443,10 @@
         selectedLine: {
             type: String
         },
+        lastUnit1BPML: {
+            type: Object,
+            observer: '_formatBPML1'
+        },
        
     },
     _routeChanged: function(newRoute) {
@@ -448,12 +463,13 @@
             this.$.getBagger1Count.generateRequest();
             this.$.getBagger2Count.generateRequest();
             this.$.getBagger3Count.generateRequest();
+            this.$.getBPMUnit1.generateRequest();
             this.$.getBagger1FaultStatus.generateRequest();
             this.$.getBagger2FaultStatus.generateRequest();
             this.$.getBagger3FaultStatus.generateRequest();
             this.$.getBagger1Status.generateRequest();
             this.$.getBagger2Status.generateRequest();
-        }, 10000);
+       }, 10000);
     },
     _formatTags: function(raw) {
         
@@ -569,6 +585,24 @@
         
         
 
+        }
+    },
+    _formatBPML1: function(raw) {
+        var series = [];
+        var sum = 0;
+        var count = 0;
+        var tsDataTrimmed = raw;
+           // console.log("Line 2 Current Count:" + JSON.stringify(raw));  
+
+        if(tsDataTrimmed != null){
+          tsDataTrimmed.forEach(function(point) {
+          series.push({x: point[0], y: point[1]});
+          sum += point[1];
+          count++;
+
+        });
+
+        this.unit1BPM = series[0].y;      
         }
     },
     _formatBagger1FaultStatus: function(raw) {
@@ -727,11 +761,11 @@
             }
 
             this.lineData = [
-			{lineNumber: 1, name: "Line 1", description: this.line1Description, target: this.Line1Target, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.line1Target},
+			{lineNumber: 1, name: "Line 1", description: this.line1Description, target: this.Line1Target, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.line1Target, bpm: this.unit1BPM},
 			{lineNumber: 2, name: "Line 2", description: this.line2Description, target: this.Line2Target, actual: this.Line2CountValue, downtime: this.line1DT, oee: this.line2OEE, fault: this.Line2FaultStatus, faultCode: this.Line2FaultStatusCode, lineStatus: this.Line2Status, productionTarget: this.line2Target}
         ];
 
-        //this._updateData();
+        this._updateData();
     },
     _lineView: function (event){
     //$("#nav")[0].selectedRoute = ["ptchronos-line"+event.model.get('item').lineNumber];
