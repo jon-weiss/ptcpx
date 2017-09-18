@@ -19,7 +19,7 @@
     url="/api/downtime" 
     last-response="{{lastDowntimeData}}" 
     on-response="onResponseLine1FaultStatus" 
-    headers = ''
+    headers$='{"startTime":"{{stValue}}", "endTime":"{{etValue}}"}'
     >
     </iron-ajax> 
       <iron-ajax 
@@ -222,7 +222,7 @@
       ready: function() {
         var that = this;  
         this.$.getTags.generateRequest();
-        this.$.getDowntime.generateRequest();
+        
 
         var hrFromNow = new Date();
         hrFromNow.setHours(hrFromNow.getHours() + 1);
@@ -235,8 +235,8 @@
         var friendlyStartTime = new Date(startTimeEpoch).toISOString();
         this.defaultStartTime = friendlyStartTime;
         this.stValue = startTimeEpoch;
-
-
+        console.log("ST" + this.stValue)
+        console.log("ET" + this.etValue)
         function getCookie(cname) {
         var name = cname + "=";
         var decodedCookie = decodeURIComponent(document.cookie);
@@ -276,6 +276,7 @@
             this.defaultEndTime = this.globalEndTime;
         } else {
             }
+        this.$.getDowntime.generateRequest();
     },
     dateChanged: function(){
         var stValue = $("#startTime")[0].dateTime;
@@ -301,7 +302,8 @@
        this.globalEndTime = friendlyEndTime;
        var friendlyStartTime = new Date(this.stValue).toISOString();
        this.globalStartTime = friendlyStartTime;
-        this.$.getDowntime.generateRequest();
+        
+       this.$.getDowntime.generateRequest();
 
        },
     checkForEquipmentType: function(equipmentType){
@@ -337,6 +339,14 @@
             notify: true
         },
         globalEndTime: {
+            type: String,
+            value: ""
+        },
+        stValue: {
+            type: String,
+            value: ""
+        },
+        etValue: {
             type: String,
             value: ""
         },

@@ -177,21 +177,26 @@ module.exports = function(app) {
 	});
 	
 	app.use('/api/downtime', function(req,res) {
-        //var selectedTagName = req.headers.name;
+		var startTime = parseInt(req.headers.starttime);
+		var endTime = parseInt(req.headers.endtime);
+		console.log("StartTime DT Value:" + startTime);
+		console.log("endTime DT Value:" + endTime);
 		var tsQuery = {
   			"groups": [
 				{"id": 1, "displayname": "Bagger 1", "tag": "PTChronos_L1.calc.downtime"},
 				{"id": 2, "displayname": "Bagger 2", "tag": "PTChronos_L2.calc.downtime"}
 			],
-  			"range": { "start": 1505310002020, "end": 1505316552020 }
+  			"range": { "start": startTime, "end": endTime }
 		};
+		console.log(JSON.stringify(tsQuery));
 		var options = {
 			method: 'POST',
 			url: 'https://pxa-timeline-ms.run.aws-usw02-pr.ice.predix.io/getdowntime',
 			headers : { 
                 authorization: 'bearer '+tokenDetails.access_token,
 				'Content-Type': 'application/json'
-            },
+			},
+			
             json: tsQuery           
 		};
 		request(options).then(reqResult =>
