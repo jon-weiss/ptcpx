@@ -11,7 +11,6 @@
     id="getBagger3FaultStatus" 
     url="/api/latestTagValue" 
     last-response="{{lastBagger3FaultStatus}}" 
-    on-response="onResponseLine3FaultStatus" 
      headers = '{"name":"PTChronos_L3.N7:0"}'
     >
   </iron-ajax>
@@ -19,7 +18,6 @@
     id="getBagger3Count" 
     url="/api/latestTagValue" 
     last-response="{{lastBagger3Count}}" 
-    on-response="onResponseLine3Count" 
     headers = '{"name":"PTChronos_L3.N100:6"}'
     >
   </iron-ajax>

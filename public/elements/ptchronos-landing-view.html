@@ -16,14 +16,12 @@
     id="getTags" 
     url="/api/tsTags" 
     last-response="{{lastTagResponse}}" 
-    on-response="onResponseToken" 
     >
   </iron-ajax>
   <iron-ajax 
     id="getBagger1Count" 
     url="/api/latestTagValue" 
     last-response="{{lastBagger1Count}}" 
-    on-response="onResponseLine1Count" 
     headers = '{"name":"PTChronos_L1.N7:19"}'
     >
   </iron-ajax>
@@ -31,7 +29,6 @@
     id="getBagger2Count" 
     url="/api/latestTagValue" 
     last-response="{{lastBagger2Count}}" 
-    on-response="onResponseLine2Count" 
     headers = '{"name":"PTChronos_L2.N7:19"}'
     >
   </iron-ajax>
@@ -39,7 +36,6 @@
     id="getBagger3Count" 
     url="/api/latestTagValue" 
     last-response="{{lastBagger3Count}}" 
-    on-response="onResponseLine3Count" 
     headers = '{"name":"PTChronos_L3.N100:6"}'
     >
   </iron-ajax>
@@ -47,7 +43,6 @@
     id="getBagger1FaultStatus" 
     url="/api/latestTagValue" 
     last-response="{{lastBagger1FaultStatus}}" 
-    on-response="onResponseLine1FaultStatus" 
     headers = '{"name":"PTChronos_L1.N7:11"}'
     >
     </iron-ajax>
@@ -55,7 +50,6 @@
     id="getBagger2FaultStatus" 
     url="/api/latestTagValue" 
     last-response="{{lastBagger2FaultStatus}}" 
-    on-response="onResponseLine2FaultStatus" 
      headers = '{"name":"PTChronos_L2.N7:11"}'
     >
   </iron-ajax>
@@ -63,7 +57,6 @@
     id="getBagger3FaultStatus" 
     url="/api/latestTagValue" 
     last-response="{{lastBagger3FaultStatus}}" 
-    on-response="onResponseLine3FaultStatus" 
      headers = '{"name":"PTChronos_L3.N7:0"}'
     >
   </iron-ajax>
@@ -71,7 +64,6 @@
     id="getBagger1Status" 
     url="/api/latestTagValue" 
     last-response="{{lastBagger1Status}}" 
-    on-response="onResponseLine1Status" 
      headers = '{"name":"PTChronos_L1.N7:1"}'
     >
   </iron-ajax>
@@ -79,7 +71,6 @@
     id="getBagger2Status" 
     url="/api/latestTagValue" 
     last-response="{{lastBagger2Status}}" 
-    on-response="onResponseLine2Status" 
      headers = '{"name":"PTChronos_L2.N7:1"}'
     >
   </iron-ajax>
@@ -95,7 +86,6 @@
     id="getBPMUnit1" 
     url="/api/latestTagValue" 
     last-response="{{lastUnit1BPML}}" 
-    on-response="onResponseLine2Status" 
      headers = '{"name":"PTChronos_L1.calc.bpm"}'
     >
   </iron-ajax>
@@ -103,7 +93,6 @@
     id="getBPMUnit2" 
     url="/api/latestTagValue" 
     last-response="{{lastUnit2BPML}}" 
-    on-response="onResponseLine2Status" 
      headers = '{"name":"PTChronos_L2.calc.bpm"}'
     >
   </iron-ajax>
