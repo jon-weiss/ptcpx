@@ -7,6 +7,7 @@
 <link rel="import" href="../bower_components/px-datetime-picker/px-datetime-picker.html">
 <link rel="import" href="../elements/seed-app-styles.html" />
 <link rel="import" href="../bower_components/px-gauge/px-gauge.html" />
+<link rel="import" href="../bower_components/px-spinner/px-spinner.html" />
 <link rel="import" href="../bower_components/px-percent-circle/px-percent-circle.html" />
 
 <dom-module id="ptchronos-landing-view">
@@ -104,8 +105,15 @@
      headers = '{"name":"PTChronos_L2.calc.bpm"}'
     >
   </iron-ajax>
+    <div class$="loadingWrapper {{showLoadingContent}}">
+          <px-spinner
+          size="100"
+          finished="{{hideSpinner}}">
+        </px-spinner>
+    </div>
   <template is="dom-repeat" items="{{lineData}}"> 
-    <div class$="lineWrapper is-{{index}} fault-{{item.faultCode}}" on-click="_lineView">
+      
+    <div class$="lineWrapper is-{{index}} fault-{{item.faultCode}} {{showMainContent}}" on-click="_lineView">
       <span class$="lineDetail {{item.lineStatus}} status">
        <b>{{item.name}}</b>: {{item.lineStatus}}
       </span>
@@ -167,7 +175,7 @@
 </div>
 
   </template>
-
+<div class$="{{showMainContent}}">
 <div class="timeSelection">
            <div class="startDate">
             <span class="label">
@@ -238,7 +246,7 @@
     </px-vis-timeseries>
   </div>
 </div>
-
+</div>
     </div>
   </template>
   <script>
@@ -247,6 +255,9 @@
       properties: {},
       ready: function() {
         var that = this;  
+        this.hideSpinner = false;
+        this.showMainContent = "hidden";
+        this.showLoadingContent = "visible";
         var linesData = document.querySelector('#linesData');      
          this.lineData = [
 			{lineNumber: 1, name: "Line 1", description: this.line1Description, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.Line1Target, bpm: this.line1BPM},
@@ -833,6 +844,9 @@
 			{lineNumber: 1, name: "Line 1", description: this.line1Description, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.line1Target, bpm: this.line1BPM},
 			{lineNumber: 2, name: "Line 2", description: this.line2Description, actual: this.Line2CountValue, downtime: this.line1DT, oee: this.line2OEE, fault: this.Line2FaultStatus, faultCode: this.Line2FaultStatusCode, productionTarget: this.line2Target}
         ];
+            this.hideSpinner = true;
+            this.showMainContent = "visible";
+            this.showLoadingContent = "hidden";
 
         this._updateData();
     },
