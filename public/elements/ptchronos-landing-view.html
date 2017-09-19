@@ -6,10 +6,18 @@
 <link rel="import" href="../bower_components/px-data-table/px-data-table.html" />
 <link rel="import" href="../bower_components/px-datetime-picker/px-datetime-picker.html">
 <link rel="import" href="../elements/seed-app-styles.html" />
+<link rel="import" href="../bower_components/px-gauge/px-gauge.html" />
+<link rel="import" href="../bower_components/px-percent-circle/px-percent-circle.html" />
 
 <dom-module id="ptchronos-landing-view">
   <template>
-    <style include="seed-app-styles"></style>
+    <style include="seed-app-styles">
+        :host{
+            --px-gauge-fill-normal-color: #46AD00;
+            --px-gauge-fill-error-color: #e32533;
+            --px-percent-circle-fill-color: #46AD00;
+        }
+    </style>
     <div class="u-mh">
 <div class="lineContainer" id="linesData">
   <iron-ajax 
@@ -105,20 +113,54 @@
       <span class="lineName lineDetail">
         {{item.description}}
       </span>
-      <span class="lineTarget lineDetail">
-        <!-- Target: {{item.productionTarget}} -->
-        Bags Per Minute: {{item.bpm}}
-      </span>
-      <span class="lineActual lineDetail">
-        Total Bag Count: {{item.actual}}
-      </span>
-      <span class="lineDowntime lineDetail">
-        <!-- Downtime: {{item.downtime}} (mm:ss) -->
-      </span>
-      <span class="lineOEE lineDetail">
-        <!-- OEE: {{item.oee}} -->
-      </span>
-      <span class="lineFault lineDetail">
+      <div class="visualWrapper">
+      <!-- <span class="lineTarget lineDetail">
+         Target: 2000 
+      </span> -->
+        <template is="dom-if" if="{{checkForBPM(item.bpm)}}">
+
+        <span class="lineActual lineDetail hasBPM">
+            Total Bag Count:
+            <px-percent-circle
+            val$="{{item.actual}}"
+            max$="{{item.productionTarget}}"
+            thickness="30">
+            </px-percent-circle>
+            <span class="largeText">{{item.actual}} / {{item.productionTarget}}</span>
+            
+        </span>
+            <span class="lineDowntime lineDetail">
+                Bags Per Minute: 
+                <px-gauge
+                    value$="{{item.bpm}}"
+                    min="0"
+                    max="11"
+                    bar-width="0"
+                    unit="bags/min"
+                    error="[[0,2]]"
+                    abnormal="[[2,4]]"
+                    normal="[[4,100]]">
+                </px-gauge>
+                <!-- Downtime: {{item.downtime}} (mm:ss) -->
+            </span>
+        </template>
+        <template is="dom-if" if="{{!checkForBPM(item.bpm)}}">
+             <span class="lineActual lineDetail noBPM">
+            Total Bag Count:
+            <px-percent-circle
+            val$="{{item.actual}}"
+            max$="{{item.productionTarget}}"
+            thickness="30">
+            </px-percent-circle>
+            <span class="largeText">{{item.actual}} / {{item.productionTarget}}</span>
+            
+        </span>
+        </template>
+        <!-- <span class="lineOEE lineDetail">
+             OEE: {{item.oee}} 
+        </span> -->
+      </div>
+        <span class="lineFault lineDetail">
         Fault: {{item.fault}}
       </span>
     </div>
@@ -208,7 +250,7 @@
         var linesData = document.querySelector('#linesData');      
          this.lineData = [
 			{lineNumber: 1, name: "Line 1", description: this.line1Description, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.Line1Target, bpm: this.line1BPM},
-			{lineNumber: 2, name: "Line 2", description: this.line2Description, actual: this.Line2CountValue, downtime: this.line2DT, oee: this.line2OEE, fault: this.Line2FaultStatus, faultCode: this.Line2FaultStatusCode, lineStatus: this.Line2Status, productionTarget: this.Line2Target,}
+			{lineNumber: 2, name: "Line 2", description: this.line2Description, actual: this.Line2CountValue, downtime: this.line2DT, oee: this.line2OEE, fault: this.Line2FaultStatus, faultCode: this.Line2FaultStatusCode, productionTarget: this.Line2Target,}
         ];
             
     var hrFromNow = new Date();
@@ -281,6 +323,9 @@
             }
 
       },
+        checkForBPM: function(hasBPM){
+		return hasBPM !== undefined;
+	  },
     dateChanged: function(){
         var stValue = $("#startTime")[0].dateTime;
         var etValue = $("#endTime")[0].dateTime;
@@ -785,8 +830,8 @@
             }
 
             this.lineData = [
-			{lineNumber: 1, name: "Line 1", description: this.line1Description, target: this.Line1Target, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.line1Target, bpm: this.line1BPM},
-			{lineNumber: 2, name: "Line 2", description: this.line2Description, target: this.Line2Target, actual: this.Line2CountValue, downtime: this.line1DT, oee: this.line2OEE, fault: this.Line2FaultStatus, faultCode: this.Line2FaultStatusCode, lineStatus: this.Line2Status, productionTarget: this.line2Target}
+			{lineNumber: 1, name: "Line 1", description: this.line1Description, actual: this.Line1CountValue, downtime: this.line1DT, oee: this.line1OEE, fault: this.Line1FaultStatus, faultCode: this.Line1FaultStatusCode, lineStatus: this.Line1Status, productionTarget: this.line1Target, bpm: this.line1BPM},
+			{lineNumber: 2, name: "Line 2", description: this.line2Description, actual: this.Line2CountValue, downtime: this.line1DT, oee: this.line2OEE, fault: this.Line2FaultStatus, faultCode: this.Line2FaultStatusCode, productionTarget: this.line2Target}
         ];
 
         this._updateData();

@@ -3294,12 +3294,44 @@ main {
     .lineContainer .lineWrapper .lineDetail {
       display: block;
       padding: 5px 0; }
+      .lineContainer .lineWrapper .lineDetail .largeText {
+        font-size: 33px;
+        max-width: 100%;
+        float: none; }
+    .lineContainer .lineWrapper .visualWrapper {
+      display: block;
+      overflow: hidden;
+      margin: 0 auto;
+      max-width: 400px; }
+      .lineContainer .lineWrapper .visualWrapper span {
+        display: block;
+        max-width: 200px;
+        float: left;
+        text-align: center; }
+        .lineContainer .lineWrapper .visualWrapper span.hasBPM:first-child {
+          margin-right: 30px; }
+        .lineContainer .lineWrapper .visualWrapper span.noBPM {
+          display: block;
+          margin: 0 auto;
+          overflow: hidden;
+          clear: both;
+          float: none;
+          max-width: 400px;
+          min-width: 400px;
+          text-align: center; }
+        .lineContainer .lineWrapper .visualWrapper span px-percent-circle {
+          max-width: 110px;
+          margin: 0 auto; }
     .lineContainer .lineWrapper .lineName {
       font-weight: bold;
       border-bottom: 1px solid #d8e0e5;
       padding-bottom: 10px;
       margin-bottom: 10px;
       margin-top: -10px; }
+    .lineContainer .lineWrapper .lineFault {
+      border-top: 1px solid #d8e0e5;
+      padding-top: 10px;
+      margin-top: 10px; }
 
 .home-bottom {
   display: -webkit-box;
