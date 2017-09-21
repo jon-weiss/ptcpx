@@ -177,33 +177,33 @@
   </template>
 <div class$="{{showMainContent}}" style="width: 100%">
 <div class="timeSelection">
-           <div class="startDate">
-            <span class="label">
-                Start Time:
-            </span>
-            <px-datetime-picker id="startTime"
-                date-format="YYYY/MM/DD"
-                time-format="HH:mm:ss"
-                time-zone="Canada/Eastern"
-                show-time-zone="abbreviatedText"
-                date-time$="{{defaultStartTime}}">
-            </px-datetime-picker>
-            </div>
-            <div class="endDate">
-                <span class="label">
-                    End Time:
-                </span>
-                <px-datetime-picker id="endTime"
-                    date-format="YYYY/MM/DD"
-                    time-format="HH:mm:ss"
-                    time-zone="Canada/Eastern"
-                    show-time-zone="abbreviatedText"
-                    date-time$="{{defaultEndTime}}">
-                </px-datetime-picker>
-            </div>
-            <div class="submitSchedule">
-             <button on-click="dateChanged">Update</button>
-        </div>
+    <div class="startDate">
+    <span class="label">
+        Start Time:
+    </span>
+    <px-datetime-picker id="startTime"
+        date-format="YYYY/MM/DD"
+        time-format="HH:mm:ss"
+        time-zone="Canada/Eastern"
+        show-time-zone="abbreviatedText"
+        date-time$="{{defaultStartTime}}">
+    </px-datetime-picker>
+    </div>
+    <div class="endDate">
+        <span class="label">
+            End Time:
+        </span>
+        <px-datetime-picker id="endTime"
+            date-format="YYYY/MM/DD"
+            time-format="HH:mm:ss"
+            time-zone="Canada/Eastern"
+            show-time-zone="abbreviatedText"
+            date-time$="{{defaultEndTime}}">
+        </px-datetime-picker>
+    </div>
+    <div class="submitSchedule">
+        <button on-click="dateChanged">Update</button>
+    </div>
 </div>
 <div class="home-bottom">
   <div class="bottom-left section">
@@ -275,8 +275,7 @@
        var friendlyStartTime = new Date(startTimeEpoch).toISOString();
        this.defaultStartTime = friendlyStartTime;
        this.stValue = startTimeEpoch;
-       console.log("ST" + this.stValue);
-       console.log("ET" + this.etValue);
+
 
             this.$.getTags.generateRequest();
             this.$.getBagger1Count.generateRequest();
@@ -333,9 +332,14 @@
             document.cookie = "endTime=" + friendlyEndTime + "; expires=" + this.cookieExpire;
             }
 
+       console.log("ST" + this.stValue);
+       console.log("ET" + this.etValue);
+       console.log("timeDifference (minutes)" + (this.etValue-this.stValue) / 60000);
+
       },
         checkForBPM: function(hasBPM){
 		return hasBPM !== undefined;
+        
 	  },
     dateChanged: function(){
         var stValue = $("#startTime")[0].dateTime;

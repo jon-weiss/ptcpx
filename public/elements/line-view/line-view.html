@@ -18,7 +18,6 @@
     id="getDowntime" 
     url="/api/downtime" 
     last-response="{{lastDowntimeData}}" 
-    on-response="onResponseLine1FaultStatus" 
     headers$='{"startTime":"{{stValue}}", "endTime":"{{etValue}}"}'
     >
     </iron-ajax> 
@@ -34,7 +33,6 @@
     id="getTags" 
     url="/api/tsTags" 
     last-response="{{lastTagResponse}}" 
-    on-response="onResponseToken" 
     >
   </iron-ajax>
     <style include="seed-app-styles">
@@ -73,7 +71,7 @@
                 </px-datetime-picker>
             </div>
             <div class="submitSchedule">
-             <button on-click="dateChanged">Update</button>
+             <button on-click="dateChanged" id="changeTime">Update</button>
         </div>
 </div>
 <div class="selectedLine">
@@ -178,13 +176,25 @@
             btn-modal-negative=""
             modal-heading="Downtime Details">
             <div class="modal-trigger">
+    <template is="dom-if" if="{{checkForNaN(item.utTotalMinutes)}}">
         Downtime:
         <px-percent-circle
-        val="4"
-        max="100"
+        val="{{getDowntimeMinutes(item.utTotalMinutes)}}"
+        max="{{totalSelectedTime}}"
         thickness="30">
         </px-percent-circle>
-    {{item.downtime}} (mm:ss)
+    
+    {{getDowntimeMinutes(item.utTotalMinutes)}} Minutes
+    </template>
+<template is="dom-if" if="{{!checkForNaN(item.utTotalMinutes)}}">
+     Downtime:
+        <px-percent-circle
+        val="0"
+        max="{{totalSelectedTime}}"
+        thickness="30">
+        </px-percent-circle>
+    Loading Downtime...
+    </template>
     </div>
         <pxa-timeline timeline-start-date="{{globalStartTime}}" timeline-end-date="{{globalEndTime}}" data-source="object" data="{{downtimeData}}"></pxa-timeline>
            </px-modal>
@@ -235,8 +245,6 @@
         var friendlyStartTime = new Date(startTimeEpoch).toISOString();
         this.defaultStartTime = friendlyStartTime;
         this.stValue = startTimeEpoch;
-        console.log("ST" + this.stValue)
-        console.log("ET" + this.etValue)
         function getCookie(cname) {
         var name = cname + "=";
         var decodedCookie = decodeURIComponent(document.cookie);
@@ -277,7 +285,11 @@
         } else {
             }
         this.$.getDowntime.generateRequest();
+        console.log("ST" + this.stValue);
+        console.log("ET" + this.etValue);
+        this.totalSelectedTime = Math.round((this.etValue-this.stValue) / 60000);
     },
+    
     dateChanged: function(){
         var stValue = $("#startTime")[0].dateTime;
         var etValue = $("#endTime")[0].dateTime;
@@ -302,12 +314,28 @@
        this.globalEndTime = friendlyEndTime;
        var friendlyStartTime = new Date(this.stValue).toISOString();
        this.globalStartTime = friendlyStartTime;
-        
+       
+       this.totalSelectedTime = Math.round((this.etValue-this.stValue) / 60000);
+       this.notifyPath(this.lineData);
        this.$.getDowntime.generateRequest();
 
+       
+       
+
        },
+    getDowntimeMinutes: function (utMins){        
+        return this.totalSelectedTime - utMins;
+    },
     checkForEquipmentType: function(equipmentType){
 		return equipmentType == "bagger";
+      },
+      checkForNaN: function(utTotalMinutes){
+          if (utTotalMinutes !== utTotalMinutes){
+            return utTotalMinutes == 10000;
+          }
+		else {
+            return utTotalMinutes;
+        }
 	  },
     listeners: {
         'px-row-click': 'rowCliked'
@@ -352,7 +380,8 @@
         },
         lineData: {
             type: Object,
-            value: ""
+            value: "",
+            notify: true
         },
         lastTagResponse: {
             type: Object,

@@ -188,7 +188,6 @@ module.exports = function(app) {
 			],
   			"range": { "start": startTime, "end": endTime }
 		};
-		console.log(JSON.stringify(tsQuery));
 		var options = {
 			method: 'POST',
 			url: 'https://pxa-timeline-ms.run.aws-usw02-pr.ice.predix.io/getdowntime',
