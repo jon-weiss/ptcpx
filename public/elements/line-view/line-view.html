@@ -43,7 +43,14 @@
     }
 </style>
      <style include="line-view-styles"></style>
-    <div class="u-mh">
+      <div class$="loadingWrapper {{showLoadingContent}}">
+          <px-spinner
+          size="100"
+          finished="{{hideSpinner}}">
+        </px-spinner>
+        
+    </div>
+    <div class$="u-mh {{showMainContent}}">
 <div class="lineContainer" id="linesData">
     <div class="timeSelection">
            <div class="startDate">
@@ -143,7 +150,7 @@
         Target: {{item.productionTarget}}
       </span>
       </span>
-    <span class="lineOEE lineDetail">
+    <!-- <span class="lineOEE lineDetail">
           OEE:
         <px-gauge
     value$="{{item.oee}}"
@@ -155,7 +162,7 @@
     abnormal="[[71,86]]"
     normal="[[87,100]]">
 </px-gauge>
-      </span>
+      </span> -->
       <span class="lineBPM lineDetail">
         BPM
         <px-gauge
@@ -183,6 +190,9 @@
         max="{{totalSelectedTime}}"
         thickness="30">
         </px-percent-circle>
+    <!-- TOTAL TIME: {{totalSelectedTime}} <br />
+    DT MINUTES: {{getDowntimeMinutes(item.utTotalMinutes)}} <br /> -->
+
     
     {{getDowntimeMinutes(item.utTotalMinutes)}} Minutes
     </template>
@@ -196,10 +206,10 @@
     Loading Downtime...
     </template>
     </div>
-        <pxa-timeline timeline-start-date="{{globalStartTime}}" timeline-end-date="{{globalEndTime}}" data-source="object" data="{{downtimeData}}"></pxa-timeline>
+        <pxa-timeline timeline-start-date="{{globalStartTime}}" timeline-end-date="{{globalEndTime}}" data-source="object" data="{{lineDtData}}"></pxa-timeline>
            </px-modal>
       </span>
-    <span class="lineReject lineDetail">
+    <!-- <span class="lineReject lineDetail">
         Units Rejected:
         <px-percent-circle
         val="8"
@@ -208,7 +218,7 @@
         </px-percent-circle>
     {{item.unitsRejected}} Units
       </span>
-    </span>
+    </span> -->
     </template>
 <template is="dom-if" if="{{!checkForEquipmentType(item.equipmentType)}}">
       
@@ -232,8 +242,6 @@
       ready: function() {
         var that = this;  
         this.$.getTags.generateRequest();
-        
-
         var hrFromNow = new Date();
         hrFromNow.setHours(hrFromNow.getHours() + 1);
         var endTimeEpoch = new Date().getTime();
@@ -284,16 +292,28 @@
             this.defaultEndTime = this.globalEndTime;
         } else {
             }
-        this.$.getDowntime.generateRequest();
+        //this.$.getDowntime.generateRequest();
         console.log("ST" + this.stValue);
         console.log("ET" + this.etValue);
-        this.totalSelectedTime = Math.round((this.etValue-this.stValue) / 60000);
+        // this.totalSelectedTime = Math.round((this.etValue-this.stValue) / 60000);
+
+        var event = new CustomEvent(
+            "dateChangedEvent", 
+            {
+                detail: {
+                    message: "Hello World!",
+                    time: new Date(),
+                },
+                bubbles: true,
+                cancelable: true
+            }
+        );
     },
     
     dateChanged: function(){
         var stValue = $("#startTime")[0].dateTime;
         var etValue = $("#endTime")[0].dateTime;
-        this.cokieExpire = new Date().getTime() + 24*60*60*1000;
+        this.cookieExpire = new Date().getTime() + 24*60*60*1000;
 
         var newStartDate = new Date(stValue);
         this.stValue= newStartDate.getTime();
@@ -315,13 +335,25 @@
        var friendlyStartTime = new Date(this.stValue).toISOString();
        this.globalStartTime = friendlyStartTime;
        
-       this.totalSelectedTime = Math.round((this.etValue-this.stValue) / 60000);
-       this.notifyPath(this.lineData);
-       this.$.getDowntime.generateRequest();
+    //    this.totalSelectedTime = Math.round((this.etValue-this.stValue) / 60000);
+       //this.$.getDowntime.generateRequest();
+       element = document.getElementById("changeTime"); 
+       element.addEventListener('click', this.customDataChangeAlert , false);
 
+        
        
-       
-
+       },
+    customDataChangeAlert: function(e){
+          
+          var event = new CustomEvent("dateChangedEvent", {
+			detail: {
+				
+			},
+			bubbles: true,
+			cancelable: true
+		});
+	
+        e.currentTarget.dispatchEvent(event);
        },
     getDowntimeMinutes: function (utMins){        
         return this.totalSelectedTime - utMins;
@@ -338,7 +370,7 @@
         }
 	  },
     listeners: {
-        'px-row-click': 'rowCliked'
+        'px-row-click': 'rowCliked',
     },
     properties: {
         selectedLine: {
@@ -395,7 +427,21 @@
             type: Object,
             observer: '_formatDowntimeData'
         },
-        
+        totalSelectedTime: {
+            type: Number
+        },
+        lineDtData: {
+            type: Object
+        },
+        hideSpinner: {
+            type: Boolean
+          },
+        showMainContent: {
+            type: String
+          },
+        showLoadingContent: {
+            type: String
+          },
     },
 	_formatTags: function(raw) {
         

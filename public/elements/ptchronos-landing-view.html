@@ -446,7 +446,8 @@
             observer: '_formatBagger3FaultStatus'
         },
         lastLine1CountValue: {
-            type: String
+            type: Number,
+            value: 0
         },
         lastLine2CountValue: {
             type: String
@@ -583,6 +584,7 @@
         console.log("PAGE CHANGED");
     },
         _formatBagger1Count: function(raw) {
+            this.Line1CountValue  = 0;
         var series = [];
         var sum = 0;
         var count = 0;

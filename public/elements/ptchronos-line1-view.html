@@ -66,13 +66,17 @@
     url="/api/downtime" 
     last-response="{{lastDowntimeData}}" 
     headers$='{"startTime":"{{stValue}}", "endTime":"{{etValue}}"}'
+    on-response$="{{_hideSpinner}}"
     >
     </iron-ajax>
-    <line-view selected-line$="{{selectedLine}}" line-data$="{{lineData}}" line-b-p-m$="{{lineBPM}}" line-status$="{{lineStatus}}"></line-view>          
+    <line-view show-loading-content$="{{showLoadingContent}}" show-main-content$="{{showMainContent}}" hide-spinner$="{{hideSpinner}}"line-dt-data$="{{rawDTData}}" total-selected-time$="{{totalSelectedTime}}" selected-line$="{{selectedLine}}" line-data$="{{lineData}}" line-b-p-m$="{{lineBPM}}" line-status$="{{lineStatus}}"></line-view>          
   </template>
   <script>
     Polymer({
       is: 'ptchronos-line-1',
+      listeners: {
+        'dateChangedEvent': '_updateDTValues'
+    },
       properties: {
         selectedLine: {
             type: String,
@@ -186,6 +190,14 @@
             type: Object,
             observer: '_formatDowntimeData'
         },
+        _hideSpinner: {
+            type: Object,
+            observer: '_hideTheSpinner'
+        },
+          hideSpinner: {
+            type: Boolean,
+            value: false
+          },
           unit1UpTimeMins: {
             type: Number,
             value: 0
@@ -197,6 +209,9 @@
       },
       ready: function() {
         var that = this;
+        this.hideSpinner = false;
+        this.showMainContent = "hidden";
+        this.showLoadingContent = "visible";
         this.lineData = [
 			{name: "Bagger 1", description: this.unit1Description, actual: this.bagger1Count, downtime: this.unit1DT, oee: this.unit1OEE, fault: this.bagger1FaultStatus, faultCode: this.bagger1FaultStatusCode, lineStatus: this.bagger1Status, productionGood: this.productionGood, productionMiddle: this.productionMiddle, productionBad: this.productionBad, productionTarget: this.unit1Target, unitsRejected: this.unit1Rejected, bpm: this.unit1BPM, equipmentType: "bagger", utTotalMinutes: this.unit1UpTimeMins},
       {name: "Bagger 2", description: this.unit2Description, actual: this.bagger2Count, downtime: this.unit2DT, oee: this.unit2OEE, fault: this.bagger2FaultStatus, faultCode: this.bagger2FaultStatusCode, lineStatus: this.bagger2Status, productionGood: this.productionGood, productionMiddle: this.productionMiddle, productionBad: this.productionBad, productionTarget: this.unit2Target, unitsRejected: this.unit2Rejected, bpm: this.unit2BPM, equipmentType: "bagger", utTotalMinutes: this.unit2UpTimeMins},
@@ -264,18 +279,27 @@
             this.defaultEndTime = this.globalEndTime;
         } else {
             }
+        this.totalSelectedTime = Math.round((this.etValue-this.stValue) / 60000);
         this.$.getDowntime.generateRequest();
            
 
       },
-      _updateDTValues: function(){
-             this.$.getDowntime.generateRequest();
-           },
+      
+    _updateDTValues: function(){
+        this.hideSpinner = false;
+        this.showMainContent = "hidden";
+        this.showLoadingContent = "visible";
+        this.$.getDowntime.generateRequest();
+    },
+    _hideTheSpinner(){
+      this.hideSpinner = true;
+      this.showMainContent = "visible";
+        this.showLoadingContent = "hidden";
+    },
       _updateData: function() {
         this.async(function() {
             this.$.getBagger1Count.generateRequest();
             this.$.getBagger2Count.generateRequest();
-            this.$.getDowntime.generateRequest();
             this.$.getBagger1FaultStatus.generateRequest();
             this.$.getBagger2FaultStatus.generateRequest();
             this.$.getBPMUnit1.generateRequest();
@@ -435,13 +459,28 @@
 
         }
     },
+      getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for(var i = 0; i <ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        },
     _formatDowntimeData: function(raw){
+        this.rawDTData = raw;
         var series = [];
         var sum = 0;
         var countGrp1 = 0;
         var countGrp2 = 0;
         var downtimeDataTrimmed = raw.items;
-        console.log("DOWNTIME TRIMMED" + downtimeDataTrimmed)
         if(downtimeDataTrimmed != null){
           downtimeDataTrimmed.forEach(function(data) {
             if (data.group == 1){
@@ -453,17 +492,26 @@
             countGrp2 = countGrp2 + timeUp;
             }
           });
-        console.log("TOTAL Bagger 1 " + Math.round(countGrp1));
-        console.log("TOTAL Bagger 2 " + Math.round(countGrp2));
+          
         this.unit1UpTimeMins = Math.round(countGrp1);
-        this.unit2UpTimeMins = Math.round(countGrp2);
+        this.unit2UpTimeMins = Math.round(countGrp2);  
+        this.stValue = this.getCookie("startTimeEpoch");
+        this.etValue = this.getCookie("endTimeEpoch");
+        this.totalSelectedTime = Math.round((this.etValue-this.stValue) / 60000); 
+        console.log("Unit 1 UPTIME: " + this.unit1UpTimeMins)
+          console.log("Unit 2 UPTIME: " +this.unit2UpTimeMins)
+          console.log("Total Time: " +this.totalSelectedTime)
+        this.lineData = [
+			{name: "Bagger 1", description: this.unit1Description, actual: this.bagger1Count, downtime: this.unit1DT, oee: this.unit1OEE, fault: this.bagger1FaultStatus, faultCode: this.bagger1FaultStatusCode, lineStatus: this.bagger1Status, productionGood: this.productionGood, productionMiddle: this.productionMiddle, productionBad: this.productionBad, productionTarget: this.unit1Target, unitsRejected: this.unit1Rejected, bpm: this.unit1BPM, equipmentType: "bagger", utTotalMinutes: this.unit1UpTimeMins},
+      {name: "Bagger 2", description: this.unit2Description, actual: this.bagger2Count, downtime: this.unit2DT, oee: this.unit2OEE, fault: this.bagger2FaultStatus, faultCode: this.bagger2FaultStatusCode, lineStatus: this.bagger2Status, productionGood: this.productionGood, productionMiddle: this.productionMiddle, productionBad: this.productionBad, productionTarget: this.unit2Target, unitsRejected: this.unit2Rejected, bpm: this.unit2BPM, equipmentType: "bagger", utTotalMinutes: this.unit2UpTimeMins},
+      {name: "Robot Vacuum", description: this.unit3Description, downtime: this.unit2DT, oee: this.unit1OEE},
+			{name: "Wrapper", description: this.unit4Description, downtime: this.unit2DT, oee: this.unit2OEE}
+
+        ];          
+        this.hideSpinner = true;
+        this.showMainContent = "visible";
+        this.showLoadingContent = "hidden"; 
         }
-
-        document.getElementById("changeTime").addEventListener("click", function(){
-            
-          console.log("TIME CHANGED!!!");
-        });
-
     },
        _formatBagger1Status: function(raw) {
         var series = [];
