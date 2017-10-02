@@ -12,6 +12,7 @@ var baseURL = "https://4538ce68-8a53-4ca0-9678-309cf01b1218.predix-uaa.run.aws-u
 
 module.exports = function(app) {
 	var tokenDetails = {};
+	try {
 	function getAccessToken() {
 		const url = baseURL + '/oauth/token?grant_type=client_credentials';
 		const uaa_util = require('predix-uaa-client');
@@ -21,71 +22,69 @@ module.exports = function(app) {
 		}).catch(function (err){
 			console.error('no haz tokenz', err);
 		});
-    };
-	app.use('/api/ts', function(req,res) {
-		var selectedTagName = req.headers.name;
-		console.log("tag: " + JSON.stringify(selectedTagName));
-		var stValue = parseInt(req.headers.starttime);
-        var etValue = parseInt(req.headers.endtime);
-        console.log("StartTime: " + stValue);
-        console.log("endTime: " + etValue);
-		var tsQuery = {
-        "start": stValue,
-        "end": etValue,
-		"tags": [
+	};
+	}
+catch(err){
+	console.log("ERROR: " + err.message)
+}
+	try{
+		app.use('/api/ts', function(req,res) {
+			var selectedTagName = req.headers.name;
+			console.log("tag: " + JSON.stringify(selectedTagName));
+			var stValue = parseInt(req.headers.starttime);
+			var etValue = parseInt(req.headers.endtime);
+			console.log("StartTime: " + stValue);
+			console.log("endTime: " + etValue);
+			var tsQuery = {
+			"start": stValue,
+			"end": etValue,
+			"tags": [
+				{
+					"name": selectedTagName,
+					"order": "asc"
+				}
+			]
+			};
+			var options = {
+				method: 'POST',
+				url: 'https://time-series-store-predix.run.aws-usw02-pr.ice.predix.io/v1/datapoints',
+				headers : { 
+					authorization: 'bearer '+tokenDetails.access_token,
+					"Predix-Zone-Id": 'b33fd8e4-1db8-47c8-bc35-ed0c114af1fd',
+					'Content-Type': 'application/json'
+				},
+				json: tsQuery
+				
+			};
+				console.log("TS DATA: " + options.data)
+			
+			request(options).then(reqResult =>
+		{
+			if ((!reqResult) || (reqResult.tags.length === 0) || (reqResult.tags[0].results.length === 0) || (reqResult.tags[0].results[0].values.length === 0))
 			{
-                "name": selectedTagName,
-                "order": "asc"
+			//finalResult.success = false;
+			//finalResult.error = "Unable to retrieve sample tag";
+			console.log("Error");
 			}
-		]
-        };
-		var options = {
-			method: 'POST',
-			url: 'https://time-series-store-predix.run.aws-usw02-pr.ice.predix.io/v1/datapoints',
-			headers : { 
-                authorization: 'bearer '+tokenDetails.access_token,
-				"Predix-Zone-Id": 'b33fd8e4-1db8-47c8-bc35-ed0c114af1fd',
-				'Content-Type': 'application/json'
-            },
-            json: tsQuery
-            
-		};
-			console.log("TS DATA: " + options.data)
-		/* request(options, function (error, response, body) {
-			if(error) {
-				res.json({
-					message : 'failure',
-					data : new Error(error)
-				});
-			} else {
-				res.json({
-					message : 'success',
-					result : JSON.parse(body)
-                });
+			else
+			{
+			//finalResult.value = reqResult.tags[0].results[0].values[0];
+			console.log("TS Data Success!" + reqResult)
 			}
-		}); */
-		request(options).then(reqResult =>
-      {
-        if ((!reqResult) || (reqResult.tags.length === 0) || (reqResult.tags[0].results.length === 0) || (reqResult.tags[0].results[0].values.length === 0))
-        {
-          //finalResult.success = false;
-		  //finalResult.error = "Unable to retrieve sample tag";
-		  console.log("Error");
-        }
-        else
-        {
-		  //finalResult.value = reqResult.tags[0].results[0].values[0];
-		  console.log("TS Data Success!" + reqResult)
-		}
-		//console.log(JSON.stringify(reqResult.tags[0].results[0].values))
-        return res.json(
-					reqResult.tags[0].results[0].values
-                );
-	  })
-		.catch(function () {
-     		console.log("TS Data: Promise Rejected");
+			//console.log(JSON.stringify(reqResult.tags[0].results[0].values))
+			return res.json(
+						reqResult.tags[0].results[0].values
+					);
+		})
+			.catch(function () {
+				console.log("TS Data: Promise Rejected");
+			});
 		});
-	});
+	}
+	catch(err){
+		console.log("ERROR: " + err.message)
+	}
+	try {
 	app.use('/api/tsTags', function(req,res) {
 		var options = {
 			method: 'GET',
@@ -112,6 +111,11 @@ module.exports = function(app) {
 			}
 		});
 	});
+	}
+	catch(err){
+		console.log("ERROR: " + err.message)
+	}
+try{
 	app.use('/api/alerts', function(req,res) {
 		var options = {
 			method: 'GET',
@@ -137,6 +141,11 @@ module.exports = function(app) {
      		console.log("Alerts Promise Rejected");
 		});
 	});
+}
+catch(err){
+		console.log("ERROR: " + err.message)
+	}
+	try{
 	app.use('/api/latestTagValue', function(req,res) {
         var selectedTagName = req.headers.name;
 		var tsQuery = {
@@ -175,6 +184,11 @@ module.exports = function(app) {
      		console.log("Last Position: Promise Rejected");
 		});
 	});
+	}
+catch(err){
+		console.log("ERROR: " + err.message)
+	}
+	try{
 	
 	app.use('/api/downtime', function(req,res) {
 		var startTime = parseInt(req.headers.starttime);
@@ -215,11 +229,15 @@ module.exports = function(app) {
 		.catch(function () {
      		console.log("Last Position: Promise Rejected");
 		});
-    });
-    
+	});
+	}
+catch(err){
+		console.log("ERROR: " + err.message)
+	}
+    try{
+			
 	app.use('/api/asset', function(req,res) {
 		var endpoint = req.headers.name;
-
 		console.log("headers  " + req.headers);
 		console.log("--------------------- Trying to get asset level " + endpoint )
 
@@ -255,5 +273,16 @@ module.exports = function(app) {
      		console.log("Promise Rejected for asset call");
 		});
 	});
+	}
+catch(err){
+		console.log("ERROR: " + err.message)
+	}
+	try {
+
+	
 	getAccessToken();
+	}
+catch(err){
+	console.log("ERROR: " + err.message)
+}
 }
