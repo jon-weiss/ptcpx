@@ -12,7 +12,7 @@ var baseURL = "https://4538ce68-8a53-4ca0-9678-309cf01b1218.predix-uaa.run.aws-u
 
 module.exports = function(app) {
 	var tokenDetails = {};
-	try {
+	
 	function getAccessToken() {
 		const url = baseURL + '/oauth/token?grant_type=client_credentials';
 		const uaa_util = require('predix-uaa-client');
@@ -23,10 +23,7 @@ module.exports = function(app) {
 			console.error('no haz tokenz', err);
 		});
 	};
-	}
-catch(err){
-	console.log("ERROR: " + err.message)
-}
+
 	try{
 		app.use('/api/ts', function(req,res) {
 			var selectedTagName = req.headers.name;
@@ -277,9 +274,7 @@ catch(err){
 catch(err){
 		console.log("ERROR: " + err.message)
 	}
-	try {
-
-	
+	try {	
 	getAccessToken();
 	}
 catch(err){
