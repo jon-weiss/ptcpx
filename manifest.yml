@@ -6,6 +6,13 @@ applications:
     buildpack: nodejs_buildpack
     command: node server/app.js
     path: dist
+    services:
+    - demo_uaa
+    - demo_ts
+    - demo_asset
+
 env:
     node_env: cloud
-
+    clientId: demo_ts_client
+    base64ClientCredential: ZGVtb190c19jbGllbnQ6QXYzbmczcnNVbml0ZSE=
+    base64ClientSecret: QXYzbmczcnNVbml0ZSE=
