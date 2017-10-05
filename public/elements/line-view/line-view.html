@@ -339,8 +339,6 @@
        
     //    this.totalSelectedTime = Math.round((this.etValue-this.stValue) / 60000);
        //this.$.getDowntime.generateRequest();
-       element = document.getElementById("changeTime"); 
-       element.addEventListener('click', this.customDataChangeAlert , false);
 
         
        
@@ -365,6 +363,10 @@
       },
       checkForNaN: function(utTotalMinutes){
           this._formatDowntimeData();
+          
+        element = document.getElementById("changeTime"); 
+        element.addEventListener('click', this.customDataChangeAlert , false);
+
           if (utTotalMinutes !== utTotalMinutes){
             return utTotalMinutes == 10000;
           }

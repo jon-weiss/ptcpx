@@ -286,9 +286,25 @@
       },
       
     _updateDTValues: function(){
+        //Show Spinner and hide main content
         this.hideSpinner = false;
         this.showMainContent = "hidden";
         this.showLoadingContent = "visible";
+        //Get updated values from time picker
+        var stValue = $("#startTime")[0].dateTime;
+        var etValue = $("#endTime")[0].dateTime;
+        //Declare cookie expiration and generate new timestamps from user definied time
+        this.cookieExpire = new Date().getTime() + 24*60*60*1000;
+        var newStartDate = new Date(stValue);
+        this.stValue= newStartDate.getTime();
+        var newEndDate = new Date(etValue); 
+        this.etValue= newEndDate.getTime();
+        //write new user-specified values to cookies
+        document.cookie = "startTimeEpoch=" + this.stValue + "; expires=" + this.cookieExpire;
+        document.cookie = "endTimeEpoch=" + this.etValue + "; expires=" + this.cookieExpire;
+        document.cookie = "startTime=" + $("#startTime")[0].dateTime + "; expires=" + this.cookieExpire;
+        document.cookie = "endTime=" + $("#endTime")[0].dateTime + "; expires=" + this.cookieExpire;
+        //generate downtime request using the new cookie values
         this.$.getDowntime.generateRequest();
     },
     _hideTheSpinner(){
@@ -476,6 +492,8 @@
         },
     _formatDowntimeData: function(raw){
         this.rawDTData = raw;
+        this.stValue = this.getCookie("startTimeEpoch");
+        this.etValue = this.getCookie("endTimeEpoch");
         var series = [];
         var sum = 0;
         var countGrp1 = 0;
@@ -495,8 +513,6 @@
           
         this.unit1UpTimeMins = Math.round(countGrp1);
         this.unit2UpTimeMins = Math.round(countGrp2);  
-        this.stValue = this.getCookie("startTimeEpoch");
-        this.etValue = this.getCookie("endTimeEpoch");
         this.totalSelectedTime = Math.round((this.etValue-this.stValue) / 60000); 
         console.log("Unit 1 UPTIME: " + this.unit1UpTimeMins)
           console.log("Unit 2 UPTIME: " +this.unit2UpTimeMins)
@@ -508,9 +524,7 @@
 			{name: "Wrapper", description: this.unit4Description, downtime: this.unit2DT, oee: this.unit2OEE}
 
         ];          
-        this.hideSpinner = true;
-        this.showMainContent = "visible";
-        this.showLoadingContent = "hidden"; 
+        
         }
     },
        _formatBagger1Status: function(raw) {
@@ -591,6 +605,9 @@
 			{name: "Wrapper", description: this.unit4Description, downtime: this.unit2DT, oee: this.unit2OEE}
 
         ];
+        this.hideSpinner = true;
+        this.showMainContent = "visible";
+        this.showLoadingContent = "hidden"; 
     this._updateData();
     
     },
