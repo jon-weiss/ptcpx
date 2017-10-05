@@ -5,7 +5,7 @@ var uaa_util = require('predix-uaa-client');
 var base64 = require('base-64');
 
 var config = {};
-var local = false;
+var local = true;
 
 var uaa_config = {};
 var asset_config = {};
@@ -23,7 +23,6 @@ if (local)
 else
 {
   var VCAP_SERVICES = JSON.parse(process.env.VCAP_SERVICES);
-
   //Postgres
   if (VCAP_SERVICES['postgres-2.0'])
   {

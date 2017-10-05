@@ -225,25 +225,32 @@
     <span class="tagValue" style="margin-left: 40px;">
       Current Value: {{tagCurrentValue}}
     </span>
-    <px-vis-timeseries 
-    debounce-resize-timing="250" 
-    width="473.3125" height="358" 
-    chart-horizontal-alignment="center" 
-    chart-vertical-alignment="center" 
-    margin='{"top":30,"bottom":60,"left":65,"right":65}' 
-    tooltip-config='{}' 
-    register-config='{"type":"vertical","width":200}' 
-    selection-type="xy" 
-    chart-data="{{tsChartData}}"
-    y-axis-config='{"title": "Values"}'
-    series-config='{"Value": {
-      "type":"line",
-      "x": "x",
-      "y": "y",
-      "yAxisUnit": ""
-    }}'
-    >
-    </px-vis-timeseries>
+    <template is="dom-if" if="{{!noTimeSeriesData}}">
+        <px-vis-timeseries 
+        debounce-resize-timing="250" 
+        width="473.3125" height="358" 
+        chart-horizontal-alignment="center" 
+        chart-vertical-alignment="center" 
+        margin='{"top":30,"bottom":60,"left":65,"right":65}' 
+        tooltip-config='{}' 
+        register-config='{"type":"vertical","width":200}' 
+        selection-type="xy" 
+        chart-data="{{tsChartData}}"
+        y-axis-config='{"title": "Values"}'
+        series-config='{"Value": {
+        "type":"line",
+        "x": "x",
+        "y": "y",
+        "yAxisUnit": ""
+        }}'
+        >
+        </px-vis-timeseries>
+    </template>
+     <template is="dom-if" if="{{noTimeSeriesData}}">
+         <div class="noDataAvailable">
+           No Data Available for the Selected Time Range.
+        </div>
+    </template>
   </div>
 </div>
 </div>
@@ -496,6 +503,10 @@
             type: String,
             value: "Loading..."
         },
+        noTimeSeriesData: {
+            type: Boolean,
+            value: false
+        },
         tagsValue: {
             type: Object
         },
@@ -550,24 +561,28 @@
         });
         this.tagList = series;
     },
-        _formatTSData: function(raw) {
+    _formatTSData: function(raw) {
         var series = [];
         var sum = 0;
         var count = 0;
         var tsDataTrimmed = raw;
             console.log("TS DATA:" + JSON.stringify(raw));  
 
-        if(tsDataTrimmed != null){
+        if(tsDataTrimmed != null && tsDataTrimmed.length > 0){
+        this.noTimeSeriesData = false;
           tsDataTrimmed.forEach(function(point) {
           series.push({x: point[0], y: point[1]});
           sum += point[1];
           count++;
-
         });
         this.tsChartData = series;
         this.tagCurrentValue = series[count - 1].y;
+        
 
-            }
+        }
+        else{
+            this.noTimeSeriesData = true;
+        }
     },
         rowCliked: function(e) {
         console.log("a row was clicked!!");
