@@ -23,6 +23,10 @@ if (local)
 else
 {
   var VCAP_SERVICES = JSON.parse(process.env.VCAP_SERVICES);
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
   //Postgres
   if (VCAP_SERVICES['postgres-2.0'])
   {
