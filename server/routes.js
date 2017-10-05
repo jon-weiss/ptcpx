@@ -230,7 +230,7 @@ module.exports = function(app)
 	      {
 	        if ((!reqResult) || (reqResult.items.length === 0) )
         	{
-				  	console.log("Downtimw Data: Error");
+					  console.log("Downtime Data: Error");
 		      }
 		      else
 		      {
@@ -240,7 +240,7 @@ module.exports = function(app)
 			  })
 				.catch(function ()
 				{
-		     		console.log("Last Position: Promise Rejected");
+		     		console.log("Downtime Data: Promise Rejected");
 				});
 			});
 		});

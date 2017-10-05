@@ -108,28 +108,32 @@
             </px-data-table>
         </div>
         <div class="trendData">
-            <px-vis-timeseries 
-            render-to-canvas
-            hide-register
-            show-tooltip
-            debounce-resize-timing="250" 
-            width="473.3125" height="358" 
-            chart-horizontal-alignment="center" 
-            chart-vertical-alignment="center" 
-            margin='{"top":30,"bottom":60,"left":65,"right":65}' 
-            tooltip-config='{}' 
-            register-config='{"type":"vertical","width":200}' 
-            selection-type="xy" 
-            chart-data="{{tsChartData}}"
-            y-axis-config='{"title": "Values"}'
-            series-config='{"Value": {
-            "type":"line",
-            "x": "x",
-            "y": "y",
-            "yAxisUnit": ""
-            }}'
-            >
-            </px-vis-timeseries>
+            <template is="dom-if" if="{{!noTimeSeriesData}}">
+                <px-vis-timeseries 
+                debounce-resize-timing="250" 
+                width="473.3125" height="358" 
+                chart-horizontal-alignment="center" 
+                chart-vertical-alignment="center" 
+                margin='{"top":30,"bottom":60,"left":65,"right":65}' 
+                tooltip-config='{}' 
+                register-config='{"type":"vertical","width":200}' 
+                selection-type="xy" 
+                chart-data="{{tsChartData}}"
+                y-axis-config='{"title": "Values"}'
+                series-config='{"Value": {
+                "type":"line",
+                "x": "x",
+                "y": "y",
+                "yAxisUnit": ""
+                }}'
+                >
+                </px-vis-timeseries>
+            </template>
+            <template is="dom-if" if="{{noTimeSeriesData}}">
+                <div class="noDataAvailable">
+                No Data Available for the Selected Time Range.
+                </div>
+            </template>
         </div>
     </div>
         </px-modal>
@@ -192,8 +196,6 @@
         </px-percent-circle>
     <!-- TOTAL TIME: {{totalSelectedTime}} <br />
     DT MINUTES: {{getDowntimeMinutes(item.utTotalMinutes)}} <br /> -->
-
-    
     {{getDowntimeMinutes(item.utTotalMinutes)}} Minutes
     </template>
 <template is="dom-if" if="{{!checkForNaN(item.utTotalMinutes)}}">
@@ -203,7 +205,7 @@
         max="{{totalSelectedTime}}"
         thickness="30">
         </px-percent-circle>
-    Loading Downtime...
+    {{DowntimeLoading}}
     </template>
     </div>
         <pxa-timeline timeline-start-date="{{globalStartTime}}" timeline-end-date="{{globalEndTime}}" data-source="object" data="{{lineDtData}}"></pxa-timeline>
@@ -362,6 +364,7 @@
 		return equipmentType == "bagger";
       },
       checkForNaN: function(utTotalMinutes){
+          this._formatDowntimeData();
           if (utTotalMinutes !== utTotalMinutes){
             return utTotalMinutes == 10000;
           }
@@ -442,6 +445,14 @@
         showLoadingContent: {
             type: String
           },
+        DowntimeLoading: {
+            type: String,
+            value: "Loading..."
+          },
+        noTimeSeriesData: {
+            type: Boolean,
+            value: false
+        },
     },
 	_formatTags: function(raw) {
         
@@ -473,17 +484,20 @@
         var tsDataTrimmed = raw;
             console.log("TS DATA:" + JSON.stringify(raw));  
 
-        if(tsDataTrimmed != null){
-          tsDataTrimmed.forEach(function(point) {
-          series.push({x: point[0], y: point[1]});
-          sum += point[1];
-          count++;
-
-        });
-        this.tsChartData = series;
-        this.tagCurrentValue = series[count - 1].y;
-
-            }
+        if(tsDataTrimmed != null && tsDataTrimmed.length > 0){
+            this.noTimeSeriesData = false;
+            tsDataTrimmed.forEach(function(point) {
+                series.push({x: point[0], y: point[1]});
+                sum += point[1];
+                count++;
+            });
+            this.tsChartData = series;
+            this.tagCurrentValue = series[count - 1].y;
+        }
+        else{
+            this.noTimeSeriesData = true;
+        }
+    
     },
         rowCliked: function(e) {
         console.log("a row was clicked!!");
@@ -528,7 +542,16 @@
             }
         },
         _formatDowntimeData: function(raw){
-        this.downtimeData = raw;
+            console.log ("DT DATA" + raw);
+            if(raw != null && raw.items.length > 0){
+                console.log("RAW ITEMS LENGTH" + raw.items.length);
+                this.downtimeData = raw;
+                this.DowntimeLoading = "Loading..."
+            }
+            else{
+                console.log("NO DT DATA");
+                this.DowntimeLoading = "No Data Available"
+            }
     }
 
         
