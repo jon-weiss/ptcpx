@@ -70,7 +70,7 @@ module.exports = function(app)
 	}
 
 
-	try
+try
 	{
 		app.use('/api/tsTags', function(req,res)
 		{
@@ -106,6 +106,162 @@ module.exports = function(app)
 		console.log("ERROR: " + err.message)
 	}
 
+try
+	{
+		app.use('/api/recipes', function(req,res)
+		{
+			return env.config.ts.checkToken().then(token =>
+			{
+				var options =
+				{
+					method: 'GET',
+					url: 'https://pxa-pg-ms.run.aws-usw02-pr.ice.predix.io/getrecipes',
+					headers :
+					{
+						"Authorization": "bearer " + token,
+		        "Predix-Zone-Id": env.config.ts.queryZoneId,
+		        "Content-Type": "application/json"
+	        }
+				};
+				request(options, function (error, response, body)
+				{
+					if(error)
+					{
+						res.json({ message : 'failure',	data : new Error(error)	});
+					}
+					else
+					{
+						res.json({ message : 'success',	result : JSON.parse(body)	});
+					}
+				});
+			});
+		});
+	}
+	catch(err)
+	{
+		console.log("ERROR: " + err.message)
+	}
+	try
+	{
+		app.use('/api/lines', function(req,res)
+		{
+			return env.config.ts.checkToken().then(token =>
+			{
+				var options =
+				{
+					method: 'GET',
+					url: 'https://pxa-pg-ms.run.aws-usw02-pr.ice.predix.io/getlines',
+					headers :
+					{
+						"Authorization": "bearer " + token,
+		        "Predix-Zone-Id": env.config.ts.queryZoneId,
+		        "Content-Type": "application/json"
+	        }
+				};
+				request(options, function (error, response, body)
+				{
+					if(error)
+					{
+						res.json({ message : 'failure',	data : new Error(error)	});
+					}
+					else
+					{
+						res.json({ message : 'success',	result : JSON.parse(body)	});
+					}
+				});
+			});
+		});
+	}
+	catch(err)
+	{
+		console.log("ERROR: " + err.message)
+	}
+	try
+	{
+		app.use('/api/schedules', function(req,res)
+		{
+			var selectedLine = req.headers.line;
+			return env.config.ts.checkToken().then(token =>
+			{
+				var options =
+				{
+					method: 'GET',
+					url: 'https://pxa-pg-ms.run.aws-usw02-pr.ice.predix.io/getschedules/' + selectedLine,
+					headers :
+					{
+						"Authorization": "bearer " + token,
+						"Predix-Zone-Id": env.config.ts.queryZoneId,
+						"Content-Type": "application/json"
+					}
+				};
+				request(options, function (error, response, body)
+				{
+					if(error)
+					{
+						res.json({ message : 'failure',	data : new Error(error)	});
+					}
+					else
+					{
+						res.json({ message : 'success',	result : JSON.parse(body)	});
+					}
+				});
+			});
+		});
+	}
+	catch(err)
+	{
+		console.log("ERROR: " + err.message)
+	}
+	try
+	{
+		app.use('/api/postSchedule', function(req,res)
+		{
+			var data = req.body.data;
+						console.log("BODY" + JSON.stringify(data));
+
+			var fullBody =
+			{
+				"lines": data
+
+			};
+			console.log("Full request: " + JSON.stringify(fullBody));
+			return env.config.ts.checkToken().then(token =>
+			{
+				var options =
+				{
+					method: 'POST',
+					url: 'https://pxa-pg-ms.run.aws-usw02-pr.ice.predix.io/addLines',
+					headers :
+					{
+						"Authorization": "bearer " + token,
+						"Predix-Zone-Id": env.config.ts.queryZoneId,
+						"Content-Type": "application/json"
+					},
+					json: fullBody
+				};
+				request(options).then(reqResult =>
+	      {
+	        if ((!reqResult) || (reqResult.items.length === 0) )
+        	{
+					  console.log("Schedule Data: Error");
+		      }
+		      else
+		      {
+				 		// console.log("Last Position: " + JSON.stringify(reqResult.tags[0].results[0].values) );
+					}
+		      return res.json( reqResult );
+			  })
+				.catch(function ()
+				{
+		     		console.log("Add Schedule Data: Promise Rejected");
+				});
+			});
+		});
+	}
+	catch(err)
+	{
+		console.log("ERROR: " + err.message)
+	}
 
 	try
 	{

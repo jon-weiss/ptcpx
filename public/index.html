@@ -69,6 +69,21 @@
     <script src="./bower_components/noty/lib/noty.js" type="text/javascript"></script>
     <script src="./lib/js/ajax.js" type="text/javascript"></script>
     <script>
+
+        (function() {
+        if ('registerElement' in document
+            && 'import' in document.createElement('link')
+            && 'content' in document.createElement('template')) {
+            // platform is good!
+        } else {
+            // polyfill the platform!
+            var e = document.createElement('script');
+            e.src = '/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+            document.body.appendChild(e);
+        }
+        })();
+
+
         // var navData = new Map([
         //     ["editor", { "label": "Editor", "id": "editor", "icon": "icons:build", "qry": "page?page=_editor.html" }],
         //     ["runtime", { "label": "Runtime", "id": "runtime", "icon": "maps:directions-run", "qry": "page?page=_runtime.html" }]
@@ -105,11 +120,11 @@
             $("#nav")[0].selectedRoute = ["landing"];
             loadPage('landing');
 
-
             console.log("Ready.");
 
 
         });
+        
     </script>
 
 </body>

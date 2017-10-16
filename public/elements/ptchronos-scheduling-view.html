@@ -2,10 +2,43 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/px-dropdown/px-dropdown.html">
 <link rel="import" href="../bower_components/px-datetime-picker/px-datetime-picker.html">
+<link rel="import" href="../bower_components/px-data-table/px-data-table.html">
 <link rel="import" href="./pxa-timeline-master/pxa-timeline.html">
+<link rel="import" href="../bower_components/px-spinner/px-spinner.html" />
 
 <dom-module id="scheduling-view">
   <template>
+<iron-ajax 
+    id="getRecipes" 
+    url="/api/recipes" 
+    last-response="{{lastRecipeData}}" 
+    method = "get"
+    >
+    </iron-ajax>
+<iron-ajax 
+    id="getLines" 
+    url="/api/lines" 
+    last-response="{{lastLinesData}}" 
+    method = "get"
+    >
+</iron-ajax>
+<iron-ajax 
+    id="getSchedules" 
+    url="/api/schedules" 
+    last-response="{{lastSchedulesData}}" 
+    method = "get"
+    headers$='{"line":"{{selectedLine}}"}'
+    >
+</iron-ajax>
+<iron-ajax 
+    id="postSchedule" 
+    url="/api/postSchedule" 
+    body="{{makebody()}}"
+    handle-as ="json"
+    content-type="application/json"
+    method="POST"
+    >
+</iron-ajax>
     <style>
         .startDate{
             display:block;
@@ -35,9 +68,9 @@
             display:block;
             float: left;
             margin-top: 20px;
-            width: 300px;
+            width: 130px;
         }
-        .submitSchedule button{
+        .submitSchedule button, .addRow{
             display: block;
             height: 30px;
             width: 100px;
@@ -48,49 +81,176 @@
             transition: ease all .3s;
             margin: 20px auto 0;
         }
-        .submitSchedule button:hover{
+        .addRow{
+            width: 50px;
+            clear: none;
+            display: block;
+            float: left;
+            margin: 0 10px;
+
+        }
+        .deleteRow{
+            height: 30px;
+        }
+        .submitSchedule button.addRow, .deleteRow{
+           
+            color: #086E87;
+            border: 1px solid #086E87;
+            background: #fff;
+        }
+        .submitSchedule button:hover, .deleteRow:hover, .addRow:hover{
             background: #1B2A33;
             color: #fff;
             transition: ease all .3s;
         }
-    </style>
-        <div class="startDate">
-            <span class="label">
-                Start Time:
-            </span>
-            <px-datetime-picker id="startTime"
-                date-format="YYYY/MM/DD"
-                time-format="HH:mm:ss"
-                time-zone="Canada/Eastern"
-                show-time-zone="abbreviatedText"
-                date-time$="{{defaultStartTime}}">
-            </px-datetime-picker>
+        .addSchedule{
+            display: block;
+            overflow: hidden;
+            width: 100%;
+            margin: 0 20px;
+        }
+        .addSchedule  input, .addSchedule select{
+            display: inline-block;
+            clear: both;
+            height: 23px;
+            padding: 5px;
+            border-bottom: 1px solid #889aa5;
+            box-shadow: none;
+            border-top: none;
+            border-right: none;
+            border-left: none;
+            margin: 10px 0;
+            margin-bottom: 9px;
+            font-size: inherit;
+            width: 85%;
+        }
+        .addSchedule select{
+            margin-top: 10px;
+            height: 35px;
+        }
+        .addSchedule px-datetime-picker{
+            margin: 12px;
+            display: block;
+            float: left;
+        }
+        .addSchedule .scheduleColumn{
+            float: left;
+            width: 10%;
+            display: block;
+            overflow: hidden;
+            padding: 10px;
+        }
+        .addSchedule .columnTitle{
+            display:block;
+            margin-top: 20px;
+            font-weight: bold;
+            float: left;
+            width: 11%;
+            margin-right: 5px;
+        }
+        .addSchedule .columnTitle.first{
+            width: 230px;
+            margin-left: 25px;
+        }
+        .scheduleWrapper{
+            display: block;
+            clear:both;
+            width: 100%;
+        }
+        .scheduleTop{
+            margin-top: 30px;
+            padding-left: 10px;
+        }
+        .scheduleTop span.title{
+            font-size: 1.5rem;
+            display: block;
+        }
+    </style>										
+        <div class="addSchedule">
+            <div class="columnTitle first">
+                Start Time
+            </div>
+            <div class="columnTitle">
+                Run Time (Hrs)
+            </div>
+            <div class="columnTitle">
+                Recipe (Rate)
+            </div>
+            <div class="columnTitle">
+                Line
+            </div>
+            <div class="columnTitle">
+                Target Quantity
+            </div>
+            <template is="dom-repeat" items="{{scheduleArray}}">
+                <div class$="scheduleWrapper item-{{item.index}}">
+                    <div class="scheduleColumn" style="min-width: 230px;">
+                    <px-datetime-picker id="startTime"
+                        date-format="YYYY/MM/DD"
+                        time-format="HH:mm:ss"
+                        time-zone="Canada/Eastern"
+                        show-time-zone="abbreviatedText"
+                        date-time$="{{<item class="startTime"></item>}}">
+                    </px-datetime-picker>
+                    </div>
+                    <div class="scheduleColumn">
+                        <input type="number" value="{{item.runTime::input}}"></input>
+                    </div>
+                    <div class="scheduleColumn">
+                        <select  value="{{item.rate::input}}">
+                            <option> ---- </option>
+                            <template is="dom-repeat" items="[[recipeList]]" as="recipe">
+                                <option>[[recipe.id]] (Rate: [[recipe.rate]])</option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="scheduleColumn">
+                        <select value={{item.line::change}}>
+                            <option> ---- </option>
+                            <template is="dom-repeat" items="[[lineList]]" as="line">
+                                <option>[[line.id]]</option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="scheduleColumn">
+                        <input type="number" value="{{item.qty::input}}"></input>
+                    </div> 
+                    <div class="scheduleColumn">
+                        <button on-click="saveScheduleRow" class="addRow">Save</button>
+                        <button on-click="deleteScheduleRow" class="deleteRow">Delete</button>
+                    </div> 
+                </div>
+            </template>
+                <div style="clear:both"></div>
+                <div class="submitSchedule">      
+                    <button on-click="addFood" class="addRow">Add Row</button>
+                </div>
+                <div class="submitSchedule">
+                    <button on-click="submitSchedule">Submit</button>
+                </div>
+                </div>
+        </div>	
+        <div class="viewSchedules">
+            <div class="scheduleTop">
+                <span class="title"> View Current Schedule</span>
+                Line Selection: 
+                <select value={{selectedLine::change}}>
+                    <template is="dom-repeat" items="[[lineList]]" as="line">
+                        <option>[[line.id]]</option>
+                    </template>
+                </select>
+                <div style="width: 100px; margin: 0 auto; display: block;">
+                    <px-spinner
+                        size="100"
+                        finished="{{hideSpinner}}">
+                    </px-spinner>
+                </div>
+            </div>
+            <px-data-table table-data="{{currentScheduleData}}" filterable sortable striped show-column-chooser>
+            </px-data-table>
         </div>
-        <div class="endDate">
-            <span class="label">
-                End Time:
-            </span>
-            <px-datetime-picker id="endTime"
-                date-format="YYYY/MM/DD"
-                time-format="HH:mm:ss"
-                time-zone="Canada/Eastern"
-                show-time-zone="abbreviatedText"
-                date-time$="{{defaultEndTime}}">
-            </px-datetime-picker>
-        </div>
-        
-        <div class="lineSelection">
-             <span class="label">
-                Line:
-            </span>
-            <select>
-                <option value="Line1">Line 1</option>
-                <option value="Line2">Line 2</option>
-            </select>
-        </div>
-         <div class="submitSchedule">
-             <button on-click="dateChanged">Submit</button>
-        </div>
+
+                
   </template>
   <script>
     Polymer({
@@ -100,11 +260,43 @@
             type: Object,
             observer: '_formatDowntimeData'
         },
+        lastRecipeData: {
+            type: Object,
+            observer: '_formatRecipeData'
+        },
+        lastLinesData: {
+            type: Object,
+            observer: '_formatLineData'
+        },
+        lastSchedulesData: {
+            type: Object,
+            observer: '_formatSchedulesData'
+        },
+        selectedLine : {
+            type: Number,
+            value: 1,
+            observer: '_selectedLineChanged'
+        },
+        currentScheduleData: {
+            type: Object,
+        },
+        finalArray: {
+            type: Array,
+            value: []
+        },
+    finalArrayParsed: {
+            type: String,
+            value: "HI"
+        },
       },
       listeners: {
         },
       ready: function() {
         var that = this;
+        this.hideSpinner = false;
+        this.$.getRecipes.generateRequest();
+        this.$.getLines.generateRequest();
+        this.$.getSchedules.generateRequest();
        var hrFromNow = new Date();
        hrFromNow.setHours(hrFromNow.getHours() + 1);
        var defaultEndTime = Math.round(new Date(hrFromNow).getTime()/1000.0);
@@ -117,6 +309,10 @@
        var friendlyStartTime = new Date(defaultStartTime * 1000).toISOString();
        this.defaultStartTime = friendlyStartTime;
 
+       this.scheduleArray = [
+            {"startTime":this.defaultStartTime, "index" : 0, "qty": "", "rate": "", "line":"", "runTime":""}
+        ]
+        //this.finalArray = []
         
       },
     dateChanged: function(){
@@ -128,8 +324,131 @@
     },
     _formatDowntimeData: function(raw){
         this.downtimeData = raw;
-        console.log("TESTING: " + JSON.stringify(this.downtimeData))
-    }
+        //console.log("TESTING: " + JSON.stringify(this.downtimeData))
+    },
+    _formatRecipeData: function(raw){
+        var trimmedData = raw.result.rows;
+        var recipes = [];
+            // for (var index = 0; index < raw.length; index++) {
+            //     recipes.push({"id": index[i].recipeid, "lineRate": index.targetlinerate, "code": index.recipecode});
+            // }
+        if(trimmedData != null){
+            trimmedData.forEach(function(value) {    
+                console.log ("Recipes " + JSON.stringify(trimmedData));
+                recipes.push({"id": value.recipeid, "code": value.recipecode, "rate": value.targetlinerate});
+            })
+        }
+
+        this.recipeList = recipes;
+    },
+    _formatLineData: function(raw){
+        var trimmedData = raw.result.rows;
+        var lines = [];
+            // for (var index = 0; index < raw.length; index++) {
+            //     recipes.push({"id": index[i].recipeid, "lineRate": index.targetlinerate, "code": index.recipecode});
+            // }
+        if(trimmedData != null){
+            trimmedData.forEach(function(value) {    
+                lines.push({"id": value.plid, "description": value.pldesc});
+            })
+        }
+
+        this.lineList = lines;
+    },
+    _formatSchedulesData: function(raw){
+
+        this.currentScheduleData = raw.result.rows;
+        this.hideSpinner = true;
+
+    },
+    _selectedLineChanged: function(){
+        this.$.getSchedules.generateRequest();
+        this.hideSpinner = false;
+    },
+
+    addFood:function(){
+
+			var tempArr=this.scheduleArray.slice();
+			var med= new Object();
+			med.startTime=this.defaultStartTime;
+			med.runTime="";
+			med.qty="";
+			med.line="";
+            med.rate="";
+            med.index= this.scheduleArray.length;
+
+			tempArr.push(med);
+
+			this.scheduleArray=tempArr;
+    },
+        saveScheduleRow: function(event){
+            var qty = event.model.get('item').qty;
+            var line = event.model.get('item').line;
+            var runTime = event.model.get('item').runTime;
+            var rate = event.model.get('item').rate;
+            var startTime = event.model.get('item').startTime;
+            var index = event.model.get('item').index;
+            var currentList = this.finalArray;
+
+                if(qty == ""){
+                    alert("Please enter a Target Quantity for the product run")
+                }
+                if(line == ""){
+                    alert("Please select a Line for the product run")
+                }
+                if(runTime == ""){
+                    alert("Please enter the Run Time (hours) for the product run")
+                }
+                if(rate == ""){
+                    alert("Please enter Recipe for the product run")
+                }
+
+                if (currentList.filter(function(e) { return e.id == index; }).length > 0) {
+                    var indexPosition = currentList.findIndex(x => x.id==index);
+                    currentList.splice(indexPosition,1);
+                    this.push('finalArray', {"id":indexPosition, "startTime": startTime, "runTime":runTime, "Quantity": qty, "Recipe": rate.substr(0,rate.indexOf(' ')), "Line":line});
+                    this.notifyPath("finalArray", this.finalArray.slice());
+                    this.finalArrayParsed = JSON.stringify(this.finalArray);
+
+                }
+                else{
+                    this.push('finalArray', {"id":index, "startTime": startTime, "runTime":runTime, "Quantity": qty, "Recipe": rate.substr(0,rate.indexOf(' ')), "Line":line});
+                    this.notifyPath("finalArray", this.finalArray.slice());
+                    this.finalArrayParsed = JSON.stringify(this.finalArray);
+
+                }
+        },
+        deleteScheduleRow: function(){
+            this.finalArray = $.grep(this.finalArray, function(e){ 
+                console.log("ID (before filter)" + e.id);
+                var id = event.model.get('item').index;
+                $( ".item-" + event.model.get('item').index ).remove();
+                return e.id != id;
+            });
+        },
+        submitSchedule: function(){
+            if(this.finalArray == ""){
+                alert("Please save at least one row before submitting the schedule.");
+            }
+            else {
+                this.finalArrayParsed = JSON.stringify(this.finalArray);
+                this.$.postSchedule.body.data = this.finalArray;
+
+                this.makebody();
+
+            }
+            console.log("ScheduleArray (Final Parsed)" + this.finalArrayParsed);
+            this.$.postSchedule.generateRequest();
+            this.$.getSchedules.generateRequest();
+
+
+        },
+        makebody: function(){
+            var obj = {};
+            obj.data = this.finalArray;
+            console.log("OBJ:" + JSON.stringify(obj))
+            return obj;  
+        },
     });
   </script>
 </dom-module>
